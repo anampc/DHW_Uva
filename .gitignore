@@ -1,0 +1,30 @@
+# R
+.Rhistory
+.Rapp.history
+.RData
+.Ruserdata
+.Rproj.user/
+*.Rproj
+
+
+# Outputs
+README.html
+# A.Temperature_DHW.html
+
+
+# knitr and R markdown default cache directories/temporary files
+*_cache/
+/cache/
+*.utf8.md
+*.knit.md
+.DS_Store
+
+# .nc SST data files
+/D.SST_nc⁩/*/*
+#/D.SST_nc⁩/Daily_CoralTemp_3.1/
+#/D.SST_nc⁩/Daily_CWR_DHW_3.1/
+#/D.SST_nc⁩/Daily_OISST_v2/
+/D.SST_nc/*.nc
+
+# Mexico SST data files
+**/B.Temperature_data/*/*

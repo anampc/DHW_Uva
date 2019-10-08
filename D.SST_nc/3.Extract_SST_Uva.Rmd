@@ -1,0 +1,181 @@
+---
+title: "Extract SST data from OISST and CRW .nc files"
+author: "Ana M. Palacio-Castro"
+date: "September 10, 2018"
+output:
+  html_document:
+    toc: true
+    theme: united
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, results="hide",)
+```
+
+```{r, message=FALSE}
+  library(raster)
+  library(parallel)
+```
+ 
+# 1. OISST Data 
+
+This chunk of the script use the .nc files obtained from ftp://ftp.cdc.noaa.gov/Datasets/noaa.oisst.v2.highres/ (data from 1981-09-01 to 2016-12-31 in the "DHW/Daily_OISST_v2" folder) to extract the SST data for the closest pixel to Uva Island reef (OISST coordinates = 7.875, 278.125)
+
+### Extract OISST temperature data based on coordinates
+
+```{r Extract_OISST_data, cache=TRUE}
+
+   # read all the .nc files 
+    flist<-list.files('Daily_OISST_v2',pattern='*.nc',full.names=TRUE)
+      
+  # brick them 
+    ras<-lapply(flist, stack)
+    
+  # Uva Island Reef coordinates   
+    lon.pts <-(278.125) 
+    lat.pts <- (7.875)
+    extract.pts <- cbind(lon.pts,lat.pts)
+
+  ## Extract data by coordinates 
+    ext <- lapply(ras,raster::extract,extract.pts)
+    #head(ext)
+    OISST <- unlist(ext, recursive = FALSE)
+    #head(SST)
+```
+
+### Bind OISST temperature data with dates
+
+```{r Bind_SST_GPS_Date}
+  
+# Create a date list 
+    Dates<-seq.Date(as.Date("1981-09-01"), as.Date("2016-12-31"), by = "day")
+    summary(Dates)
+    Date<-as.character(Dates)
+    #summary(Date)
+    #head(Date)
+      
+# Bind GPS points and Dates    Date.location <- merge(pts, Date)
+    OISST.data<-data.frame(Date, OISST)
+    OISST.data$Date<-as.Date(OISST.data$Date)
+    # head(OISST.data)  
+    # summary(OISST.data)
+    write.csv(OISST.data, "Uva_Daily_OISST_1982-2016.csv", row.names=FALSE)
+```
+
+# 2. CRW Data (CoralTemp) 
+
+This chunk of the script use the .nc files obtained from ftp://ftp.star.nesdis.noaa.gov/pub/sod/mecb/crw/data/coraltemp/v1.0/nc/ (data from 1985 to 2016 in the "Daily_CoralTemp_3.1" folder) to extract the SST data for the closest pixel to Uva Island reef CRW_5km coordinates = 7.825003, -81.77499)
+
+```{r}
+rm(list = ls())  # Remove all objects from memory
+```
+
+### Extract CRW 5km temperature data based on coordinates
+
+```{r Extract_OISST_data, cache=TRUE}
+
+   # read all the .nc files 
+    flist<-list.files('Daily_CoralTemp_3.1',pattern='*.nc',full.names=TRUE)
+      
+  # brick them 
+    ras<-lapply(flist, stack)
+    
+  # Uva Island Reef coordinates   
+    lon.pts <-(-81.77499)
+    lat.pts <- (7.825003)
+    extract.pts <- cbind(lon.pts,lat.pts)
+
+  ## Extract data by coordinates 
+    ext <- lapply(ras,raster::extract,extract.pts)
+    #head(ext)
+    CRWSST <- unlist(ext, recursive = FALSE)
+    #head(CRWSST)
+    #summary(CRWSST)
+```
+
+### Bind CRW 5km temperature data with dates
+
+```{r Bind_SST_GPS_Date}
+  
+# Create a date list 
+    Dates<-seq.Date(as.Date("1985-01-01"), as.Date("2016-12-31"), by = "day")
+    Date<-as.character(Dates)
+    #head(Date)
+      
+# Bind GPS points and Dates    Date.location <- merge(pts, Date)
+    CRWSST.data<-data.frame(Date, CRWSST)
+    CRWSST.data$Date<-as.Date(CRWSST.data$Date)
+    # head(CRWSST.data)  
+    # summary(CRWSST.data)
+    write.csv(CRWSST.data, "Uva_Daily_CRW_5km_1985-2016.csv", row.names=FALSE)
+
+```
+
+### Extract CRW 5km MMM from climatology
+
+This chunk of the script use the .nc file obtained from ftp://ftp.star.nesdis.noaa.gov/pub/sod/mecb/crw/data/5km/v3.1/climatology/nc/ct5km_climatology_v3.1.nc cointaining the climatology calculated from the 1985-2012 preriod to extract the MMM temperature for the closest pixel to Uva Island reef CRW_5km coordinates = 7.825003, -81.77499)
+
+```{r Extract_OISST_data, cache=TRUE}
+
+  # Read climatology file
+  Climatology_MMM <- "ct5km_climatology_v3.1.nc"
+  MMM.data <- brick(Climatology_MMM) 
+  #MMM.data
+  
+  # Uva Island Reef   
+   lon.pts <-(-81.77499) 
+   lat.pts <- (7.825003)
+   extract.pts <- cbind(lon.pts,lat.pts)
+  
+  #MMM <- raster::extract(MMM.data, extract.pts,method="bilinear")
+  MMM <- raster::extract(MMM.data, extract.pts,method="simple")
+  write.csv(MMM, "Uva_CRW_MMM_1985-2012.csv", row.names=FALSE)
+```
+
+# 3. CRW DHW 
+
+This chunk of the script use the .nc files obtained from ftp://ftp.star.nesdis.noaa.gov/pub/sod/mecb/crw/data/5km/v3.1/nc/v1.0/daily/dhw/ (data from 1985 to 2016 in the "Daily_CWR_DHW_3.1" folder) to extract the already calculated DHW data for the closest pixel to Uva Island reef CRW_5km coordinates = 7.825003, -81.77499)
+
+```{r}
+rm(list = ls())  # Remove all objects from memory
+```
+
+### Extract CRW 5km DHW data based on coordinates
+
+```{r, cache=TRUE}
+
+  #  # read all the .nc files 
+  #   flist<-list.files('Daily_CWR_DHW_3.1',pattern='*.nc',full.names=TRUE)
+  #     
+  # # brick them 
+  #   ras<-lapply(flist, stack)
+  #   
+  # # Uva Island Reef coordinates   
+  #   lon.pts <-(-81.77499)
+  #   lat.pts <- (7.825003)
+  #   extract.pts <- cbind(lon.pts,lat.pts)
+  # 
+  # ## Extract data by coordinates 
+  #   ext <- lapply(ras,raster::extract,extract.pts)
+  #   #head(ext)
+  #   DHW <- unlist(ext, recursive = FALSE)
+  #   #head(SST)
+  #   #summary(DHW)
+```
+
+### Bind CRW 5km DHW data with dates
+
+```{r}
+  
+# # Create a date list 
+#     Dates<-seq.Date(as.Date("1985-03-25"), as.Date("2016-12-31"), by = "day")
+#     Date<-as.character(Dates)
+#     #head(Date)
+#       
+# # Bind GPS points and Dates    Date.location <- merge(pts, Date)
+#     DHW.data<-data.frame(Date, DHW)
+#     DHW.data$Date<-as.Date(DHW.data$Date)
+#     # head(DHW.data)  
+#     # summary(DHW.data)
+#     write.csv(DHW.data, "Uva_Daily_DHW_5km_1985-2016.csv", row.names=FALSE)
+```
