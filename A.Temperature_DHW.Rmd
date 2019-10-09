@@ -46,15 +46,15 @@ Obtain temperature data from the different sources
 
 ```{r ImportData}
 
-#OI_SST 
+#OI_SST (provided by Ruben van Hooidonk)
     Uva.OI<-read.csv("B.Temperature_data/Uva_Daily_OISST_1982-2016.csv",header = T)
     Uva.OI$Date<-as.Date(Uva.OI$Date, format="%Y-%m-%d")
 
-#InSitu (Tyler Smith)
+#InSitu (provided by Tyler Smith)
     Uva.InSitu<-read.csv("B.Temperature_data/Uva_Daily_InSitu_1997-2018.csv", header = T)
     Uva.InSitu$Date<-as.Date(Uva.InSitu$Date, format="%Y-%m-%d")
 
-# CRW-5km SST
+# CRW-5km SST (provided by Ruben van Hooidonk)
     Uva.CRW<-read.csv("B.Temperature_data/Uva_Daily_CRW_5km_1985-2016.csv",header = T)
     Uva.CRW$Date<-as.Date(Uva.CRW$Date, format="%Y-%m-%d")
     ```
@@ -77,12 +77,12 @@ Compile all temperature data in tall format
     Uva.OI.L$Source<-"OI_SST"
     colnames(Uva.OI.L) <- c("Date","Temperature","Source")
 
-#InSitu (Tyler)
+#InSitu
     Uva.InSitu.L<-Uva.InSitu
     Uva.InSitu.L$source<-"In_situ"
     colnames(Uva.InSitu.L) <- c("Date","Temperature", "Source")
     
-# SST CRW-5km products
+# CRW-5km SST
       Uva.CRW.L<-Uva.CRW
       Uva.CRW.L$Source<-"CRW_SST"
       colnames(Uva.CRW.L) <- c("Date", "Temperature", "Source")
@@ -388,6 +388,8 @@ ggsave(file="C.Outputs/Figure_1a.svg", plot=Figure1a, width=6.5, height=3.5)
 
 ```
 
+**Figure 1**: Accumulated heat stress and thermal regime at Uva Island, Gulf of Chiriquí. **a.** Degree heating weeks (DHW) during the 1982-83, 1997-98 and 2015-16 ENSOs estimated using daily OISST data. The yellow dashed line marks the 4 DHW threshold for significant likelihood of bleaching, and the red dashed line marks 8 DHW threshold for significant likelihood of mortality. </br> 
+
 ## 4.3 Temperature and DHW during 2015-16 ENSO events based on OI and InSitu data
 
 ### Figure 1b
@@ -450,6 +452,7 @@ ggsave(file="C.Outputs/Figure_1b.svg", plot=Figure1b_Final, width=6.5, height=4.
 
 ```
 
+**Figure 1**: Accumulated heat stress and thermal regime at Uva Island, Gulf of Chiriquí. **b.** Thermal regime before and during the 2015-16 El Niño using daily OISST (black) and in situ (gray) data collected at Uva Island reef (~3m depth). Upper plot and right-hand axis show mean daily temperature (solid lines) and bleaching threshold (dashed lines) for each data set. Lower plot and and left-hand axis show DHW calculated from each data source. The blue vertical lines represent the periods when the coral samples were collected. </br> 
 
 # 5. Potential bias based on data source (Supplementary Information)
 
@@ -666,6 +669,8 @@ Sources<-grid.arrange(
 ggsave(file="C.Outputs/Figure_S1.svg", plot=Sources, width=7, height=7)
 
 ```
+
+**Supplementary Figure S1:** Temperature comparison among different data sources. **a.** Temperature for the August 2014 - August 2016 period. **b.** Correlation between OISST (v2) data and *in situ* (3m) data. **c.** Correlation between CRW (CoralTemp v3.1) and *in situ* data. Panels I contain SST values under the bleaching threshold for both data sets being compared (there is not accumulation of DHW). Panels II contain SST values above the bleaching threshold for both data sets being compared (both data sets accumulate of DHW). Panels III contain the cases in which satellite values were above the bleaching threshold, both not the *in situ* values (potential DHW overestimation). Panels IV contain the cases in which *in situ* values were above the bleaching threshold, both not the satellite values (potential DHW underestimation). </br> 
 
 ## 5.2 SST with all data from any year with the 3 sources
 
@@ -938,6 +943,8 @@ Sources3<-grid.arrange(
 ggsave(file="C.Outputs/Figure_S2.svg", plot=Sources3, width=7, height=7)
 ```
 
+**Supplementary Figure S2:** Degree heating weeks (DHW) index comparison among different data sources. **a.** DHW calculated for November 2014 - August 2016. **b.** Correlation between OISST derived in situ derived DHW indices. **c.** Correlation between CRW (CoralTemp v3.1) derived and in situ derived DHW indices. </br> 
+
 ## 5.4 DHW with all DHW data available for all 3 sources
 
 ```{r}
@@ -1115,6 +1122,8 @@ Other way to compare ENSOs is to look at the magnitude and number of the Hot Spo
   ggsave(file="C.Outputs/Figure_S3.svg", plot=SupplumentFigure3a, width=6, height=5)
 
 ```
+
+**Supplementary Figure S3:** HotSpots (SST - MMM) at Uva Island reef during the two-year period of each El Niño calculated using NOAA OISSTv2 data. Number of HotSpots (n) have been summarized to show how many times they exceeded 2ºC (HotSpots > 2ºC, top values in each panel), were higher than 1ºC but lower or equal to 2ºC (1ºC < HotSpots ≤ 2ºC, middle values), or were lower or equal to 1ºC (0ºC < HotSpots ≤ 1ºC, bottom values). Note that only HotSpots > 1ºC are included in the estimation of DHW. Summation of all HotSpots > 1ºC during each 2 year period were 131.2 during 1982-83, 123.5 during 1997-98, and 108.7 during 2015-16. </br> 
 
 ##6.2  Number of HS higher than 0, 1, 2, and 3C, area under HS curve
 
