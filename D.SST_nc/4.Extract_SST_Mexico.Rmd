@@ -1,0 +1,66 @@
+---
+title: "Extract SST data from OISST and CRW .nc files"
+author: "Ana M. Palacio-Castro"
+date: "September 10, 2019"
+output:
+  html_document:
+    toc: true
+    theme: united
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, results="hide",)
+```
+
+```{r, message=FALSE}
+  library(raster)
+  library(parallel)
+  library(tidyverse)
+```
+ 
+# 1. OISST Data 
+
+This chunk of the script use the .nc files obtained from ftp://ftp.cdc.noaa.gov/Datasets/noaa.oisst.v2.highres/ (data from 1981-09-01 to 2016-12-31 in the "DHW/Daily_OISST_v2" folder) to extract the SST data for the closest of multiple locations in Banderas Bay, Mexico (Supplementary Information)
+
+### Extract OISST temperature data based on coordinates
+
+```{r Extract_OISST_data, cache=TRUE}
+
+   # read all the .nc files 
+    flist<-list.files('Daily_OISST_v2',pattern='*.nc',full.names=TRUE)
+      
+  # brick them 
+    ras<-lapply(flist, stack)
+    
+  # Uva Island Reef coordinates   
+    pts <- read.csv("Mexico_coordinates.csv", stringsAsFactors = FALSE)
+    extract.pts <- cbind(lon=pts$lon, lat=pts$lat)
+
+  ## Extract data by coordinates 
+    ext_mex <- lapply(ras,raster::extract,extract.pts)
+    #head(ext)
+    OISST_mex <- unlist(ext_mex, recursive = FALSE)
+    #head(OISST_mex)
+```
+
+### Bind OISST temperature data with dates
+
+```{r Bind_SST_GPS_Date}
+  
+# Create a date list 
+    Dates<-seq.Date(as.Date("1981-09-01"), as.Date("2016-12-31"), by = "day")
+    summary(Dates)
+    Date<-as.character(Dates)
+    #summary(Date)
+    #head(Date)
+      
+# Bind GPS points and Dates    
+    Date.location <- merge(Date, pts)
+    OISST_mex.data<-data.frame(Date.location, OISST_mex)
+    OISST_mex.data$Date<-as.Date(OISST_mex.data$x)
+    OISST_mex.data<-dplyr::select(OISST_mex.data, Location, OISST_mex, Date)
+    # head(OISST_mex.data)  
+    # summary(OISST_mex.data)
+    write.csv(OISST_mex.data, "BanderasBay_Daily_OISST_1982-2016.csv", row.names=FALSE)
+```
+
