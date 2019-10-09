@@ -55,9 +55,15 @@ This chunk of the script use the .nc files obtained from ftp://ftp.cdc.noaa.gov/
     #head(Date)
       
 # Bind GPS points and Dates    
+<<<<<<< HEAD
     Date.location <- merge(pts,Date)
     OISST_mex.data<-data.frame(Date.location, OISST_mex)
     OISST_mex.data$Date<-as.Date(OISST_mex.data$y)
+=======
+    Date.location <- merge(Date, pts)
+    OISST_mex.data<-data.frame(Date.location, OISST_mex)
+    OISST_mex.data$Date<-as.Date(OISST_mex.data$x)
+>>>>>>> 48a7847175ea4fde4748e59e920390f73506bc6b
     OISST_mex.data<-dplyr::select(OISST_mex.data, Location, OISST_mex, Date)
     # head(OISST_mex.data)  
     # summary(OISST_mex.data)
