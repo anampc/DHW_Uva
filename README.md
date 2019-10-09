@@ -27,6 +27,8 @@ Directory containing data files in .csv format with the temperature data for Uva
 
 * **B.Temperature_data/Uva_Daily_OISST_1982-2016.csv:** Optimal Interpolation SST data (V2) for the closest pixel to Uva Island reef
 
+* **B.Temperature_data/BanderasBay_Daily_OISST_1982-2016.csv:** Optimal Interpolation SST data (V2) for the closest pixel to Uva Island reef
+
 </br>
 
 #### C.Outputs: 
@@ -48,4 +50,8 @@ You would need ~ 123GB of space for CRW SST data and ~17GB for OISST data
    
 - **D.SST_nc/2.Get_CoralTemp_data.sh:**  This script downloads NOAA CRW 5km SST data (CoralTemp v3.1) (fftp://ftp.star.nesdis.noaa.gov/pub/sod/mecb/crw/data/coraltemp/v1.0/nc/) and the 1985-2012 climatology  (ftp://ftp.star.nesdis.noaa.gov/pub/sod/mecb/crw/data/5km/v3.1/climatology/nc/ct5km_climatology_v3.1.nc). It could also download the already calculated DHW values (ftp://ftp.star.nesdis.noaa.gov/pub/sod/mecb/crw/data/5km/v3.1/nc/v1.0/daily/dhw/) directly from NOAA CRW 5km products. However, these lines are commented by default since we performed these calculations ourselves based on the CRW SST data (CoralTemp) and MMM. 
 
-- **3.D.SST_nc/3.Extract_SST_Uva.Rmd:** This script extracts the SST data from OISST and CRW datasets for Uva Island. It also extracts the already calculated climatology (MMM) from CRW 5km products. CRW DHW values from NOAA CRW 5km products can be extracted as well. However, these lines are commented by default since we performed these calculations ourselves based on the CRW SST data (CoralTemp) and MMM.
+- **D.SST_nc/3.Extract_SST_Uva.Rmd:** This script extracts the SST data from OISST and CRW datasets for Uva Island. It also extracts the already calculated climatology (MMM) from CRW 5km products. CRW DHW values from NOAA CRW 5km products can be extracted as well. However, these lines are commented by default since we performed these calculations ourselves based on the CRW SST data (CoralTemp) and MMM.
+
+- **D.SST_nc/4.Extract_SST_Mexico.Rmd:** This script extracts OISST data for multiple locations at Banderas Bay, Mexico (Supplementary Information).
+
+- **D.SST_nc/Mexico_coordinates.csv:** Coordinates in OI format for locations at Banderas Bay used by the **4.Extract_SST_Mexico.Rmd** script to extract the SST data. 

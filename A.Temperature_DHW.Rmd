@@ -4,10 +4,12 @@ author: "Ana Palacio"
 date: "April 12, 2019"
 output:
   html_document:
-    toc: true
-    theme: united
-    fig_width: 7
     fig_height: 7
+    fig_width: 7
+    df_print: paged
+    toc: yes
+editor_options:
+  chunk_output_type: inline
 ---
 
 ```{r GlobalOptoins, include=FALSE}
@@ -24,7 +26,7 @@ knitr::opts_chunk$set(echo=TRUE, message = FALSE, warning = FALSE)
   library(gridExtra) 
   library(zoo)
   library(reshape2)
-
+  library(knitr)
 
 # Default ggplot settings
   ggthe_bw<-theme(plot.background=element_blank(),
@@ -1118,28 +1120,28 @@ Other way to compare ENSOs is to look at the magnitude and number of the Hot Spo
 
 ```{r HS_numbers}
   
-    # Number of HS > 1
+    # Number of HotSpots; HS > 1
         HS_N_1<-as.data.frame(Nino.OI_data %>%
               group_by(Event) %>%
               summarize(N = n(),
                         Cont=sum (HotSpot>=1)))
         HS_N_1
     
-    # Number of 0<HS<1
+    # Number of HotSpots; 0<HS<1
         HS_N_0_1<-as.data.frame(Nino.OI_data %>%
               group_by(Event) %>%
               summarize(N = n(),
                         Cont=sum (HotSpot>0 & HotSpot<1)))
         HS_N_0_1
     
-    # Number of 1<HS<2
+    # Number of HotSpots; 1<HS<2
         HS_N_1_2<-as.data.frame(Nino.OI_data %>%
               group_by(Event) %>%
               summarize(N = n(),
                         Cont=sum (HotSpot>=1 & HotSpot<2)))
         HS_N_1_2
     
-    # Number of 2<HS<3
+    # Number of HotSpots; 2<HS<3
         HS_N_2_3<-as.data.frame(Nino.OI_data %>%
               group_by(Event) %>%
               summarize(N = n(),
@@ -1167,3 +1169,93 @@ Other way to compare ENSOs is to look at the magnitude and number of the Hot Spo
         summarize(Sum = sum (HotSpot[HotSpot>2])))
   HS2_Aggregated
 ```
+
+
+# 7. OI DHW for Banderas Bay (Supplementary Information)
+
+Import the SST data 
+
+```{r ImportMexData}
+
+#OI_SST 
+    Mex.OI<-read.csv("B.Temperature_data/BanderasBay_Daily_OISST_1982-2016.csv",header = T)
+    Mex.OI$Date<-as.Date(Mex.OI$Date, format="%Y-%m-%d")
+
+```
+ 
+Calculate MMM: For the climatology and maximum monthly mean (MMM) we selected the SST data from 1985-2012, to keep consistency with the CRW methodology
+
+```{r Climatology_mex}
+  Mex.OI$Month<-month(Mex.OI$Date)
+  Mex.OI$Year<-year(Mex.OI$Date)
+  Mex.OI$Location<-as.factor(Mex.OI$Location) 
+  
+  # SELECT YEARS 1985-2012
+    M_SST.1985_2012<-filter(Mex.OI, Year>1984)
+    M_SST.1985_2012<-filter(M_SST.1985_2012, Year<2013)
+  
+  # Mean temperature per month in each location
+  M_OI.MonthlyClimatology_1985_2012<-M_SST.1985_2012 %>%
+    group_by(Location, Month) %>%
+    summarize(Clima_M = mean(OISST_mex, na.rm = TRUE))
+  #OI.MonthlyClimatology_1985_2012
+  # Maximum Monthly Mean in each location
+  M_MMM_OI<-M_OI.MonthlyClimatology_1985_2012 %>%
+    group_by(Location) %>%
+    summarize(MMM = max(Clima_M, na.rm = TRUE))
+  # M_MMM_OI
+```
+
+Calculate HotSpots
+
+```{r HotSpot_mex}
+Mex.OI <- merge(Mex.OI, M_MMM_OI, on="Site") # Add the MMM to each location
+Mex.OI <- Mex.OI[order(Mex.OI$Location, Mex.OI$Date),]
+Mex.OI$HotSpot<-(Mex.OI$OISST_mex-(Mex.OI$MMM))
+Mex.OI$HotSpot<-ifelse(Mex.OI$HotSpot>=0,
+                       Mex.OI$HotSpot, 0)# REMOVE NEGATIVE ANOMALIES
+Mex.OI$D_Stress<-ifelse(Mex.OI$HotSpot>=1,
+                       Mex.OI$HotSpot, 0) # REMOVE HotSpots <1
+Mex.OI$W_Stress<-(Mex.OI$D_Stress/7) # Transform daily to weekly values
+```
+
+Calculate DHW
+
+```{r DHW_mex}
+# Rolling sum of 84 days (12 weeks) Hotspots for each location
+DHW_Daily<-Mex.OI %>% 
+  group_by(Location) %>%
+  mutate(NOAA_DHW_OI=rollapplyr(W_Stress,list(-(83:0)),sum,fill=NA, partial=FALSE)) %>%
+  ungroup
+#write.csv(DHW_Daily, "DHW_Daily.csv")
+```
+
+Summarise max DHW and max SST by location and year
+
+```{r Mexico_summary}
+# Summary by Site and year (max values)
+  DHW_Year_Summary<-DHW_Daily %>%
+         group_by(Location, Year) %>%
+         dplyr::summarise(maxDHW = max(NOAA_DHW_OI),
+                          maxSST = max(OISST_mex))
+
+# Select major ENSO years
+Table_S1<- DHW_Year_Summary[ which(
+  DHW_Year_Summary$Year==1982 |
+  DHW_Year_Summary$Year==1983 |
+  DHW_Year_Summary$Year==1997 |
+  DHW_Year_Summary$Year==1998 |
+  DHW_Year_Summary$Year==2015 |
+  DHW_Year_Summary$Year==2016), ]
+
+#Wide format data
+    Table_S1<-Table_S1[, -4]
+    Table_S1 <-spread(Table_S1, Year, maxDHW)
+```
+
+### Table S1
+
+```{r TableS1, echo=FALSE}
+kable(Table_S1, caption = "Supplementary Table S1: Maximum annual DHW experienced at Banderas Bay (Mexico), an ETP location not affected by the 1982-83 ENSO, but that was heavily impacted by the 1997-98 event. Uva Island values have been added to facilitate comparison.")
+```
+ 

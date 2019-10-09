@@ -19,7 +19,7 @@ knitr::opts_chunk$set(echo = TRUE, results="hide",)
  
 # 1. OISST Data 
 
-This chunk of the script use the .nc files obtained from ftp://ftp.cdc.noaa.gov/Datasets/noaa.oisst.v2.highres/ (data from 1981-09-01 to 2016-12-31 in the "DHW/Daily_OISST_v2" folder) to extract the SST data for the closest pixel to Uva Island reef (OISST coordinates = 7.875, 278.125)
+This chunk of the script use the .nc files obtained from ftp://ftp.cdc.noaa.gov/Datasets/noaa.oisst.v2.highres/ (data from 1981-09-01 to 2016-12-31 in the "DHW/Daily_OISST_v2" folder) to extract the SST data for the closest pixel to Uva Island reef (OISST coordinates = 7.875, 278.125).
 
 ### Extract OISST temperature data based on coordinates
 
@@ -40,7 +40,7 @@ This chunk of the script use the .nc files obtained from ftp://ftp.cdc.noaa.gov/
     ext <- lapply(ras,raster::extract,extract.pts)
     #head(ext)
     OISST <- unlist(ext, recursive = FALSE)
-    #head(SST)
+    #head(OISST)
 ```
 
 ### Bind OISST temperature data with dates
@@ -54,7 +54,7 @@ This chunk of the script use the .nc files obtained from ftp://ftp.cdc.noaa.gov/
     #summary(Date)
     #head(Date)
       
-# Bind GPS points and Dates    Date.location <- merge(pts, Date)
+# Bind GPS points and Dates
     OISST.data<-data.frame(Date, OISST)
     OISST.data$Date<-as.Date(OISST.data$Date)
     # head(OISST.data)  
