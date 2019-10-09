@@ -122,7 +122,6 @@ Calculate the mean SST per month-year, the monthly mean and then obtain the maxi
   MMM_OI<-max(Uva.OI.MonthlyClimatology_1985_2012$Clima_M)
   MMM_OI
 
-#write_csv(Uva.OI.MonthlyClimatology_1985_2012, "Outputs/UvaSST.M_clima_mean.csv")
 ```
 
 
@@ -183,8 +182,6 @@ This code uses in situ available data collected by Tyler Smith et al and calcula
 # Get maximum monthly mean (MMM)              
   MMM_InSitu<-max(Uva.InSitu.MonthlyClimatology$Clima_M)
   MMM_InSitu
-
-#write_csv(InSituMonthlyClimatology, "Outputs/UvaInSitu.M_clima_mean.csv")
 ```
 
 Notes about MMMs
@@ -258,7 +255,7 @@ This code uses a mixed approach (Ruben van Hooidonk + CRW) to estimate DHW, base
                               Uva.InSitu.L$HotSpot, 0) # Select HotSpots >=1
       Uva.InSitu.L$W_DHW<-(Uva.InSitu.L$Stress/7)
       Uva.InSitu.L$DHW<-rollapplyr(Uva.InSitu.L$W_DHW,list(-(83:0)),sum,fill=NA)
-      #write.csv(Uva.InSitu.L, "Outputs/GC_DHW_Daily_Uva.csv")
+     
 ```
 
 # 4. DHW plots
@@ -1236,7 +1233,6 @@ DHW_Daily<-Mex.OI %>%
   group_by(Location) %>%
   mutate(NOAA_DHW_OI=rollapplyr(W_Stress,list(-(83:0)),sum,fill=NA, partial=FALSE)) %>%
   ungroup
-#write.csv(DHW_Daily, "DHW_Daily.csv")
 ```
 
 Summarise max DHW and max SST by location and year
@@ -1260,6 +1256,7 @@ Table_S1<- DHW_Year_Summary[ which(
 #Wide format data
     Table_S1<-Table_S1[, -4]
     Table_S1 <-spread(Table_S1, Year, maxDHW)
+    write.csv(Table_S1, "C.Outputs/Table_S1.csv", row.names = F)
 ```
 
 ### Table S1

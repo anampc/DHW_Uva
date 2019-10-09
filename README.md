@@ -38,6 +38,7 @@ Directory containing figure files related with temperature and DHW included on t
 * Figure S1
 * Figure S2 
 * Figure S3
+* Table S1
 
 </br>
 
