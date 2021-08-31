@@ -34,11 +34,10 @@ Directory containing data files in .csv format with the temperature data for Uva
 #### C.Outputs: 
 Directory containing figure files related with temperature and DHW included on the paper.
 
-* Figure 1a and 1b
+* Figure 1a and 2a
 * Figure S1
 * Figure S2 
 * Figure S3
-* Table S1
 
 </br>
 
@@ -53,6 +52,3 @@ You would need ~ 123GB of space for CRW SST data and ~17GB for OISST data
 
 - **D.SST_nc/3.Extract_SST_Uva.Rmd:** This script extracts the SST data from OISST and CRW datasets for Uva Island. It also extracts the already calculated climatology (MMM) from CRW 5km products. CRW DHW values from NOAA CRW 5km products can be extracted as well. However, these lines are commented by default since we performed these calculations ourselves based on the CRW SST data (CoralTemp) and MMM.
 
-- **D.SST_nc/4.Extract_SST_Mexico.Rmd:** This script extracts OISST data for multiple locations at Banderas Bay, Mexico (Supplementary Information).
-
-- **D.SST_nc/Mexico_coordinates.csv:** Coordinates in OI format for locations at Banderas Bay used by the **4.Extract_SST_Mexico.Rmd** script to extract the SST data. 
