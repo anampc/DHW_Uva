@@ -8,8 +8,9 @@ output:
     fig_width: 7
     df_print: paged
     toc: yes
+    code_folding: hide
 editor_options:
-  chunk_output_type: inline
+  chunk_output_type: console
 ---
 
 ```{r GlobalOptoins, include=FALSE}
@@ -380,16 +381,31 @@ Figure1a <-Figure1a +
                      breaks = seq(0,10, by=2)) +  
   scale_colour_manual(values = c("magenta","cyan", "black"), name="ENSO")
 Figure1a
-
-ggsave(file="C.Outputs/Figure_1a.svg", plot=Figure1a, width=6.5, height=3.5)
+#ggsave(file="C.Outputs/Figure_1a.svg", plot=Figure1a, width=6.5, height=3.5)
 
 ```
 
-**Figure 1**: Accumulated heat stress and thermal regime at Uva Island, Gulf of Chiriquí. **a.** Degree heating weeks (DHW) during the 1982-83, 1997-98 and 2015-16 ENSOs estimated using daily OISST data. The yellow dashed line marks the 4 DHW threshold for significant likelihood of bleaching, and the red dashed line marks 8 DHW threshold for significant likelihood of mortality. </br> 
+```{r}
+
+Figure1a2 <-Figure1a +
+  geom_line(aes(y = DHW), size=1.0) + 
+  scale_x_continuous(limits = c(0,701), expand = c(0, 0), 
+                     name=("Month"),
+                     breaks = seq(0,701, by= 90))+
+  scale_y_continuous(limits = c(0,11), 
+                     name=(expression("DHW"~(degree*C ~"-weeks"))), expand = c(0.01, 0.01),
+                     breaks = seq(0,10, by=2)) +  
+  facet_grid(~Event)
+Figure1a2
+#ggsave(file="C.Outputs/Figure_1a2.svg", plot=Figure1a2, width=7, height=4)
+```
+
+
+**Figure 1a**: Accumulated heat stress and thermal regime at Uva Island, Gulf of Chiriquí. **a.** Degree heating weeks (DHW) during the 1982-83, 1997-98 and 2015-16 ENSOs estimated using daily OISST data. The yellow dashed line marks the 4 DHW threshold for significant likelihood of bleaching, and the red dashed line marks 8 DHW threshold for significant likelihood of mortality. </br> 
 
 ## 4.3 Temperature and DHW during 2015-16 ENSO events based on OI and InSitu data
 
-### Figure 1b
+### Figure 2a
 ```{r 2015_16ENSO_OI}
  # Figure 1b
 
@@ -443,13 +459,13 @@ DHWPlot<-DHWPlot +
     annotate("rect", xmin= as.Date("2016-04-16"), xmax = as.Date("2016-04-21"), 
                  ymin = 0, ymax = 10, fill="blue", alpha = .3)
 
-Figure1b_Final<-grid.arrange(TemperaturePlot, DHWPlot, nrow=2, heights=c(6/10, 4/10))
+Figure2a_Final<-grid.arrange(TemperaturePlot, DHWPlot, nrow=2, heights=c(6/10, 4/10))
 
-ggsave(file="C.Outputs/Figure_1b.svg", plot=Figure1b_Final, width=6.5, height=4.5)
+#ggsave(file="C.Outputs/Figure_1b.svg", plot=Figure2a_Final, width=6.5, height=4.5)
 
 ```
 
-**Figure 1**: Accumulated heat stress and thermal regime at Uva Island, Gulf of Chiriquí. **b.** Thermal regime before and during the 2015-16 El Niño using daily OISST (black) and in situ (gray) data collected at Uva Island reef (~3m depth). Upper plot and right-hand axis show mean daily temperature (solid lines) and bleaching threshold (dashed lines) for each data set. Lower plot and and left-hand axis show DHW calculated from each data source. The blue vertical lines represent the periods when the coral samples were collected. </br> 
+**Figure 2**: Accumulated heat stress and thermal regime at Uva Island, Gulf of Chiriquí. **a.** Thermal regime before and during the 2015-16 El Niño using daily OISST (black) and in situ (gray) data collected at Uva Island reef (~3m depth). Upper plot and right-hand axis show mean daily temperature (solid lines) and bleaching threshold (dashed lines) for each data set. Lower plot and and left-hand axis show DHW calculated from each data source. The blue vertical lines represent the periods when the coral samples were collected. </br> 
 
 # 5. Potential bias based on data source (Supplementary Information)
 
@@ -663,7 +679,7 @@ Temperature.Wide_2014_2016$CRW_Difference<-
 Sources<-grid.arrange(
   TemperatureSource, arrangeGrob(GCITYvsOI,GCITYvsCRW, ncol=2), heights=c(5/10, 5/10), ncol = 1)
 
-ggsave(file="C.Outputs/Figure_S1.svg", plot=Sources, width=7, height=7)
+# ggsave(file="C.Outputs/Figure_S1.svg", plot=Sources, width=7, height=7)
 
 ```
 
@@ -937,7 +953,7 @@ Wide.data.DHW2<-reshape(Wide.data.DHW,
 Sources3<-grid.arrange(
   DHWSource, arrangeGrob(GCITYvsOI_DHW,GCITYvsCRW_DHW, ncol=2), heights=c(5/10, 5/10), ncol = 1)
 
-ggsave(file="C.Outputs/Figure_S2.svg", plot=Sources3, width=7, height=7)
+#ggsave(file="C.Outputs/Figure_S2.svg", plot=Sources3, width=7, height=7)
 ```
 
 **Supplementary Figure S2:** Degree heating weeks (DHW) index comparison among different data sources. **a.** DHW calculated for November 2014 - August 2016. **b.** Correlation between OISST derived in situ derived DHW indices. **c.** Correlation between CRW (CoralTemp v3.1) derived and in situ derived DHW indices. </br> 
@@ -1088,11 +1104,11 @@ Sources4<-grid.arrange(
 
 Other way to compare ENSOs is to look at the magnitude and number of the Hot Spots
 
-### Figure S3
+### Figure S3?
 
 ```{r Supplement3}
 
-# Supplemantary Figure 3
+# Supplemantary Figure ?
   
   SupplumentFigure3a<-ggplot(Nino.OI_data, aes(x=Days)) + ggthe_bw +
       theme(legend.box.background = element_rect(),
@@ -1116,7 +1132,7 @@ Other way to compare ENSOs is to look at the magnitude and number of the Hot Spo
       facet_grid(Event~.)
   SupplumentFigure3a
   
-  ggsave(file="C.Outputs/Figure_S3.svg", plot=SupplumentFigure3a, width=6, height=5)
+  #ggsave(file="C.Outputs/Figure_S3.svg", plot=SupplumentFigure3a, width=6, height=5)
 
 ```
 
@@ -1175,93 +1191,3 @@ Other way to compare ENSOs is to look at the magnitude and number of the Hot Spo
         summarize(Sum = sum (HotSpot[HotSpot>2])))
   HS2_Aggregated
 ```
-
-
-# 7. OI DHW for Banderas Bay (Supplementary Information)
-
-Import the SST data 
-
-```{r ImportMexData}
-
-#OI_SST 
-    Mex.OI<-read.csv("B.Temperature_data/BanderasBay_Daily_OISST_1982-2016.csv",header = T)
-    Mex.OI$Date<-as.Date(Mex.OI$Date, format="%Y-%m-%d")
-
-```
- 
-Calculate MMM: For the climatology and maximum monthly mean (MMM) we selected the SST data from 1985-2012, to keep consistency with the CRW methodology
-
-```{r Climatology_mex}
-  Mex.OI$Month<-month(Mex.OI$Date)
-  Mex.OI$Year<-year(Mex.OI$Date)
-  Mex.OI$Location<-as.factor(Mex.OI$Location) 
-  
-  # SELECT YEARS 1985-2012
-    M_SST.1985_2012<-filter(Mex.OI, Year>1984)
-    M_SST.1985_2012<-filter(M_SST.1985_2012, Year<2013)
-  
-  # Mean temperature per month in each location
-  M_OI.MonthlyClimatology_1985_2012<-M_SST.1985_2012 %>%
-    group_by(Location, Month) %>%
-    summarize(Clima_M = mean(OISST_mex, na.rm = TRUE))
-  #OI.MonthlyClimatology_1985_2012
-  # Maximum Monthly Mean in each location
-  M_MMM_OI<-M_OI.MonthlyClimatology_1985_2012 %>%
-    group_by(Location) %>%
-    summarize(MMM = max(Clima_M, na.rm = TRUE))
-  # M_MMM_OI
-```
-
-Calculate HotSpots
-
-```{r HotSpot_mex}
-Mex.OI <- merge(Mex.OI, M_MMM_OI, on="Site") # Add the MMM to each location
-Mex.OI <- Mex.OI[order(Mex.OI$Location, Mex.OI$Date),]
-Mex.OI$HotSpot<-(Mex.OI$OISST_mex-(Mex.OI$MMM))
-Mex.OI$HotSpot<-ifelse(Mex.OI$HotSpot>=0,
-                       Mex.OI$HotSpot, 0)# REMOVE NEGATIVE ANOMALIES
-Mex.OI$D_Stress<-ifelse(Mex.OI$HotSpot>=1,
-                       Mex.OI$HotSpot, 0) # REMOVE HotSpots <1
-Mex.OI$W_Stress<-(Mex.OI$D_Stress/7) # Transform daily to weekly values
-```
-
-Calculate DHW
-
-```{r DHW_mex}
-# Rolling sum of 84 days (12 weeks) Hotspots for each location
-DHW_Daily<-Mex.OI %>% 
-  group_by(Location) %>%
-  mutate(NOAA_DHW_OI=rollapplyr(W_Stress,list(-(83:0)),sum,fill=NA, partial=FALSE)) %>%
-  ungroup
-```
-
-Summarise max DHW and max SST by location and year
-
-```{r Mexico_summary}
-# Summary by Site and year (max values)
-  DHW_Year_Summary<-DHW_Daily %>%
-         group_by(Location, Year) %>%
-         dplyr::summarise(maxDHW = max(NOAA_DHW_OI),
-                          maxSST = max(OISST_mex))
-
-# Select major ENSO years
-Table_S1<- DHW_Year_Summary[ which(
-  DHW_Year_Summary$Year==1982 |
-  DHW_Year_Summary$Year==1983 |
-  DHW_Year_Summary$Year==1997 |
-  DHW_Year_Summary$Year==1998 |
-  DHW_Year_Summary$Year==2015 |
-  DHW_Year_Summary$Year==2016), ]
-
-#Wide format data
-    Table_S1<-Table_S1[, -4]
-    Table_S1 <-spread(Table_S1, Year, maxDHW)
-    write.csv(Table_S1, "C.Outputs/Table_S1.csv", row.names = F)
-```
-
-### Table S1
-
-```{r TableS1, echo=FALSE}
-kable(Table_S1, caption = "Supplementary Table S1: Maximum annual DHW experienced at Banderas Bay (Mexico), an ETP location not affected by the 1982-83 ENSO, but that was heavily impacted by the 1997-98 event. Uva Island values have been added to facilitate comparison.")
-```
- 
