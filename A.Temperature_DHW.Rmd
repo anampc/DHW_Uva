@@ -1,7 +1,7 @@
 ---
 title: "DHW estimation for Uva Island reef"
 author: "Ana Palacio"
-date: "April 12, 2019"
+date: "Nov 1, 2021"
 output:
   html_document:
     fig_height: 7
@@ -58,6 +58,10 @@ Obtain temperature data from the different sources
 # CRW-5km SST (provided by Ruben van Hooidonk)
     Uva.CRW<-read.csv("B.Temperature_data/Uva_Daily_CRW_5km_1985-2016.csv",header = T)
     Uva.CRW$Date<-as.Date(Uva.CRW$Date, format="%Y-%m-%d")
+    
+#CCI_SST (provided by Ruben van Hooidonk)
+    Uva.CCI<-read.csv("B.Temperature_data/Uva_Daily_CCI_1982-2016.csv",header = T)
+    Uva.CCI$Date<-as.Date(Uva.CCI$Date, format="%Y-%m-%d")
     ```
   
 Compile all temperature data in wide format
@@ -66,12 +70,18 @@ Compile all temperature data in wide format
     
 Temperature.Wide<-merge(Uva.OI, Uva.InSitu, on=Date, all=TRUE)
 Temperature.Wide<-merge(Temperature.Wide, Uva.CRW, on=Date, all=TRUE)
+Temperature.Wide<-merge(Temperature.Wide, Uva.CCI, on=Date, all=TRUE)
 
 ```
 
 Compile all temperature data in tall format
 
 ```{r DataTall}
+
+#CCI_SST
+    Uva.CCI.L<-Uva.CCI
+    Uva.CCI.L$Source<-"CCI_SST"
+    colnames(Uva.CCI.L) <- c("Date","Temperature","Source")
 
 #OISST
     Uva.OI.L<-Uva.OI
@@ -88,7 +98,7 @@ Compile all temperature data in tall format
       Uva.CRW.L$Source<-"CRW_SST"
       colnames(Uva.CRW.L) <- c("Date", "Temperature", "Source")
       
-Temperature.Tall<-rbind(Uva.OI.L, Uva.InSitu.L, Uva.CRW.L)      
+Temperature.Tall<-rbind(Uva.OI.L, Uva.InSitu.L, Uva.CRW.L, Uva.CCI.L)      
       
 ```
 
@@ -185,11 +195,43 @@ This code uses in situ available data collected by Tyler Smith et al and calcula
   MMM_InSitu
 ```
 
+
+## 2.4 CCI MMM
+
+Calculate the mean SST per month-year, the monthly mean and then obtain the maximum monthly mean (MMM) using data CCI from 1985-2012.
+
+```{r CCI_MMM}
+
+# Extract months and years from date
+  Uva.CCI$Month<-month(Uva.CCI$Date)
+  Uva.CCI$Year<-year(Uva.CCI$Date)
+
+# Select data from 1985-2012
+  Uva.CCI.1985_2012<-filter(Uva.CCI, Year>1984)
+  Uva.CCI.1985_2012<-filter(Uva.CCI.1985_2012, Year<2013)
+
+# Calculate month-year mean SST
+  Uva.CCI.MM_1985_2012<-Uva.CCI.1985_2012 %>%
+    group_by(Month, Year) %>%
+    summarize(MM = mean(SST_CCI, na.rm = TRUE))
+
+# Calculate monthly mean SST
+  Uva.CCI.MonthlyClimatology_1985_2012<-Uva.CCI.MM_1985_2012 %>%
+    group_by(Month) %>%
+    summarize(Clima_M = mean(MM, na.rm = TRUE))
+  Uva.CCI.MonthlyClimatology_1985_2012
+
+# Get maximum monthly mean (MMM)
+  MMM_CCI<-max(Uva.CCI.MonthlyClimatology_1985_2012$Clima_M)
+  MMM_CCI
+
+```
+
 Notes about MMMs
 
-* Values: CRW MMM (28.9 C) < Insitu MMM (29.05983 C) < OI MMM (29.16445 C)
-* Observations: Insitu MMM (n=7,864 days) < CRW MMM (n=10,227) = OI MMM (n=10,227)
-* Time frame: Insitu MMM (1997-2018, with gaps) < CRW MMM (1985-2012) = OI MMM (1985-2012)
+* Values: CRW MMM (28.9 C) < Insitu MMM (29.05983 C) < OI MMM (29.16445 C) < CCI (29.24618)
+* Observations: Insitu MMM (n=7,864 days) < CRW MMM (n=10,227) = OI MMM (n=10,227) = CCI MMM (n=10,227)
+* Time frame: Insitu MMM (1997-2018, with gaps) < CRW MMM (1985-2012) = OI MMM (1985-2012) = OI MMM (1985-2012)
 
 Calculated CRW MMM is higher (29.09882 C) than MMM extracted directly from the 5km products (28.9 C), (ftp://ftp.star.nesdis.noaa.gov/pub/sod/mecb/crw/data/5km/v3.1/climatology/nc/ct5km_climatology_v3.1.nc). 
 
@@ -259,6 +301,30 @@ This code uses a mixed approach (Ruben van Hooidonk + CRW) to estimate DHW, base
      
 ```
 
+
+## 3.4 CCI DHW calculation
+
+This code uses a mixed approach (Ruben van Hooidonk + CRW) to estimate DHW, based on CCI_SST data:
+
+* SST data source is ESA Sea Surface Temperature Climate Change Initiative (ESA SST CCI): GHRSST Multi-Product ensemble (GMPE) ftp://anon-ftp.ceda.ac.uk/neodc/esacci/sst/data/CDR_v2/Analysis/L4/v2.1. 
+* CCI data were added since someone told us the OISST is not so good on early years. So we need to test the effect on the DHW calculations. 
+* MMM values used are the calculated above, based on CCI_v2.1 SST from the period 1985-2012. This is the same period used for the CRW_5KM_V3_climatology.
+* Ruben gave me oneone temperature value per day (mean?), there is no distinction between day/night SST as there is in CRW products
+* HotSpots are calculated daily, then divided by 7 to calculate DHW from DHDays
+
+```{r CCI_SST_DHW_MMM_29.246}
+
+##### Calculate IO DHW
+      Uva.CCI.L$HotSpot<-(Uva.CCI.L$Temperature-(MMM_CCI))
+      Uva.CCI.L$HotSpot<-ifelse(Uva.CCI.L$HotSpot>=0,
+                              Uva.CCI.L$HotSpot, 0)# REMOVE NEGATIVE ANOMALIES
+      Uva.CCI.L$Stress<-ifelse(Uva.CCI.L$HotSpot>=1,
+                              Uva.CCI.L$HotSpot, 0) # REMOVE HotSpot lower than 1
+      Uva.CCI.L$W_Stress<-(Uva.CCI.L$Stress/7) # DHDays to DHWeeks
+      Uva.CCI.L$DHW<-rollapplyr(Uva.CCI.L$W_Stress,list(-(83:0)),sum,fill=NA)# Add 12 weeks of heat stress data 
+```
+
+
 # 4. DHW plots
 
 ## 4.1 Explore available data based on all data sources
@@ -274,17 +340,22 @@ This code uses a mixed approach (Ruben van Hooidonk + CRW) to estimate DHW, base
     DHW.OI.W<-Uva.OI.L[, c("Date", "DHW")]
     colnames(DHW.OI.W) <- c("Date","OI_DHW")
     
+    DHW.CCI.W<-Uva.CCI.L[, c("Date", "DHW")]
+    colnames(DHW.CCI.W) <- c("Date","CCI_DHW")
+    
     DHW.Wide<-merge(DHW.InSitu.W, DHW.CRW.W, on=Date, all=TRUE)
     DHW.Wide<-merge(DHW.Wide, DHW.OI.W, on=Date, all=TRUE)
+    DHW.Wide<-merge(DHW.Wide, DHW.CCI.W, on=Date, all=TRUE)
   
 # Long DHW data
     Uva.InSitu.DHW<-Uva.InSitu.L[, c("Source", "Date", "Temperature", "HotSpot", "DHW")]
     Uva.CRW.DHW<-Uva.CRW.L[, c("Source", "Date", "Temperature",  "HotSpot", "DHW")]
     Uva.OI.DHW<-Uva.OI.L[, c("Source", "Date", "Temperature",  "HotSpot", "DHW")]
+    Uva.CCI.DHW<-Uva.CCI.L[, c("Source", "Date", "Temperature",  "HotSpot", "DHW")]
 
-    Long.data.DHW<-rbind(Uva.InSitu.DHW,Uva.CRW.DHW,Uva.OI.DHW)
+    Long.data.DHW<-rbind(Uva.InSitu.DHW, Uva.CRW.DHW, Uva.OI.DHW, Uva.CCI.DHW)
     Long.data.DHW$Source<-factor(Long.data.DHW$Source, 
-                            levels = c("OI_SST","CRW_SST","In_situ"))
+                            levels = c("CCI_SST", "OI_SST","CRW_SST","In_situ"))
     Long.data.DHW$Year<-lubridate::year(Long.data.DHW$Date)
     Long.data.DHW$Month<-lubridate::month(Long.data.DHW$Date)
 
@@ -356,12 +427,17 @@ AllSources
 
 Nino.OI_data<-merge(x = ENSO_Dates, y = Uva.OI.L, by = "Date", all.x = TRUE)
 Nino.OI_data$Dates<-format(Nino.OI_data$Date, format= "%m-%d")
+
+Nino.CCI_data<-merge(x = ENSO_Dates, y = Uva.CCI.L, by = "Date", all.x = TRUE)
+Nino.CCI_data$Dates<-format(Nino.CCI_data$Date, format= "%m-%d")
 #head(Nino.OI_data,n=2)
 #tail(Nino.OI_data,n=2)
 
 ```
 
-### Figure 1a
+### Figure 3 ENSOs
+
+Togheter
 
 ```{r ENSOs_OI}
 
@@ -385,8 +461,9 @@ Figure1a
 
 ```
 
-```{r}
+Separated
 
+```{r}
 Figure1a2 <-Figure1a +
   geom_line(aes(y = DHW), size=1.0) + 
   scale_x_continuous(limits = c(0,701), expand = c(0, 0), 
@@ -401,9 +478,9 @@ Figure1a2
 ```
 
 
-**Figure 1a**: Accumulated heat stress and thermal regime at Uva Island, Gulf of Chiriquí. **a.** Degree heating weeks (DHW) during the 1982-83, 1997-98 and 2015-16 ENSOs estimated using daily OISST data. The yellow dashed line marks the 4 DHW threshold for significant likelihood of bleaching, and the red dashed line marks 8 DHW threshold for significant likelihood of mortality. </br> 
+**Figure 2a**: Accumulated heat stress and thermal regime at Uva Island, Gulf of Chiriquí. **a.** Degree heating weeks (DHW) during the 1982-83, 1997-98 and 2015-16 ENSOs estimated using daily OISST data. The yellow dashed line marks the 4 DHW threshold for significant likelihood of bleaching, and the red dashed line marks 8 DHW threshold for significant likelihood of mortality. </br> 
 
-## 4.3 Temperature and DHW during 2015-16 ENSO events based on OI and InSitu data
+## 4.3 Temperature and DHW during 2015-16 ENSO events based on all data sources OI and InSitu data
 
 ### Figure 2a
 ```{r 2015_16ENSO_OI}
@@ -467,6 +544,73 @@ Figure2a_Final<-grid.arrange(TemperaturePlot, DHWPlot, nrow=2, heights=c(6/10, 4
 
 **Figure 2**: Accumulated heat stress and thermal regime at Uva Island, Gulf of Chiriquí. **a.** Thermal regime before and during the 2015-16 El Niño using daily OISST (black) and in situ (gray) data collected at Uva Island reef (~3m depth). Upper plot and right-hand axis show mean daily temperature (solid lines) and bleaching threshold (dashed lines) for each data set. Lower plot and and left-hand axis show DHW calculated from each data source. The blue vertical lines represent the periods when the coral samples were collected. </br> 
 
+
+
+```{r 2015_16ENSO_All}
+ # Figure 1b
+
+TemperaturePlotAll<-ggplot(Temperature.Wide, aes(x=Date)) + ggthe_bw+
+    theme(legend.position = "none") +
+    scale_colour_manual(values = c("gray", "black", "purple", "red"), name="Source")
+   
+TemperaturePlotAll<-TemperaturePlotAll + 
+  geom_hline(yintercept=MMM_OI+1, linetype="dashed", color="purple")+
+  geom_hline(yintercept=MMM_InSitu+1, linetype="dashed", color="black")+
+  geom_hline(yintercept=MMM_CRW+1, linetype="dashed", color="grey")+
+  geom_hline(yintercept=MMM_CCI+1, linetype="dashed", color="red")+
+  
+  geom_line(aes(y = (OISST), colour = "OI_SST"), linetype=1, size=0.3, alpha=0.9) +      
+  geom_line(aes(y = (Temperature), colour = "In situ"), size=0.4, alpha=0.9) +
+  geom_line(aes(y = (CRWSST), colour = "CRW_SST"), linetype=1, size=0.3, alpha=0.9) +
+   geom_line(aes(y = (SST_CCI), colour = "SST_CCI"), size=0.4, alpha=0.9) +
+  
+  scale_x_date(date_breaks = "3 months", date_labels = "%y-%m", 
+               limits = c(as.Date("2014-07-15"), as.Date("2016-07-10")),
+               name = "") +
+  scale_y_continuous(limits = c(26,31.1), expand = c(0.01, 0), 
+                   name=(expression("Temperature"~(degree*C))),
+                   breaks = seq(26,31, by=1))+
+  annotate("rect", xmin= as.Date("2014-08-17"), xmax = as.Date("2014-08-24"), 
+                 ymin = 26, ymax = 31, fill="blue", alpha = .3) +
+  annotate("rect", xmin= as.Date("2015-08-16"), xmax = as.Date("2015-08-22"), 
+                 ymin = 26, ymax = 31, fill="blue", alpha = .3) + 
+  annotate("rect", xmin= as.Date("2016-04-16"), xmax = as.Date("2016-04-21"), 
+                 ymin = 26, ymax = 31, fill="blue", alpha = .3)
+  
+DHWPlot<-ggplot(DHW.Wide, aes(x=Date)) + ggthe_bw+
+   theme(legend.box.background = element_rect(),
+        legend.position = c(0.2, 0.5)) +
+    scale_colour_manual(values = c("red", "gray", "black", "purple"), name="Source")
+DHWPlot<-DHWPlot +
+    geom_hline(yintercept=8, linetype="dashed", color="red", size=0.5)+
+    geom_hline(yintercept=4, linetype="dashed", color="orange", size=0.5)+
+    geom_line(aes(y = (OI_DHW), colour = "OI SST"), linetype=1, size=0.3, alpha=0.9) +      
+    geom_line(aes(y = (InSitu_DHW), colour = "In situ"), size=0.4, alpha=0.9) +
+    geom_line(aes(y = (CRW_DHW), colour = "CRW"), size=0.4, alpha=0.9) +  
+    geom_line(aes(y = (CCI_DHW), colour = "CCI"), size=0.4, alpha=0.9) +  
+    
+    scale_x_date(date_breaks = "3 months", date_labels = "%m/%Y", 
+               limits = c(as.Date("2014-07-15"), as.Date("2016-07-10")),
+               name = "Month-Year") +
+    scale_y_continuous(limits = c(0,10), expand = c(0.01, 0), 
+                   name=(expression("DHW"~(degree*C~"-weeks"))),
+                   breaks = seq(0,10, by=2))+
+    annotate("rect", xmin= as.Date("2014-08-17"), xmax = as.Date("2014-08-24"), 
+                 ymin = 0, ymax = 10, fill="blue", alpha = .3) +
+    annotate("rect", xmin= as.Date("2015-08-16"), xmax = as.Date("2015-08-22"), 
+                 ymin = 0, ymax = 10, fill="blue", alpha = .3) + 
+    annotate("rect", xmin= as.Date("2016-04-16"), xmax = as.Date("2016-04-21"), 
+                 ymin = 0, ymax = 10, fill="blue", alpha = .3)
+
+Figure2AllSources<-grid.arrange(TemperaturePlotAll, DHWPlot, nrow=2, heights=c(6/10, 4/10))
+
+#ggsave(file="C.Outputs/Figure_1b.svg", plot=Figure2a_Final, width=6.5, height=4.5)
+
+```
+
+**Figure 2 (Supplementary)**: Accumulated heat stress and thermal regime at Uva Island, Gulf of Chiriquí. **a.** Thermal regime before and during the 2015-16 El Niño using daily OISST (black) and in situ (gray) data collected at Uva Island reef (~3m depth). Upper plot and right-hand axis show mean daily temperature (solid lines) and bleaching threshold (dashed lines) for each data set. Lower plot and and left-hand axis show DHW calculated from each data source. The blue vertical lines represent the periods when the coral samples were collected. </br> 
+
+
 # 5. Potential bias based on data source (Supplementary Information)
 
 ## 5.1 SST with data from 2014-2016
@@ -478,9 +622,11 @@ Figure2a_Final<-grid.arrange(TemperaturePlot, DHWPlot, nrow=2, heights=c(6/10, 4
   summary(Temperature.Wide_2014_2016$OISST)
   summary(Temperature.Wide_2014_2016$CRWSST )
   summary(Temperature.Wide_2014_2016$Temperature)
+  summary(Temperature.Wide_2014_2016$SST_CCI)
 ```
 
-### Figure S1
+### Figure S1 - OI CRW
+
 ```{r CheckSorcesBias2014_2016_Plots, echo=FALSE}
 
 TemperatureSource<-ggplot(Temperature.Wide_2014_2016, aes(x=Date)) + 
@@ -685,7 +831,316 @@ Sources<-grid.arrange(
 
 **Supplementary Figure S1:** Temperature comparison among different data sources. **a.** Temperature for the August 2014 - August 2016 period. **b.** Correlation between OISST (v2) data and *in situ* (3m) data. **c.** Correlation between CRW (CoralTemp v3.1) and *in situ* data. Panels I contain SST values under the bleaching threshold for both data sets being compared (there is not accumulation of DHW). Panels II contain SST values above the bleaching threshold for both data sets being compared (both data sets accumulate of DHW). Panels III contain the cases in which satellite values were above the bleaching threshold, both not the *in situ* values (potential DHW overestimation). Panels IV contain the cases in which *in situ* values were above the bleaching threshold, both not the satellite values (potential DHW underestimation). </br> 
 
+### Figure S1 - OI, CRW, CCI
+
+```{r CheckSorcesBias2014_2016_PlotsAll, echo=FALSE}
+
+TemperatureSource<-ggplot(Temperature.Wide_2014_2016, aes(x=Date)) + 
+      ggthe_bw + ggtitle("a.") +
+      scale_x_date(date_breaks = "3 months", date_labels = "%m-%Y", 
+                   limits = c(as.Date("2014-08-01"), as.Date("2016-08-15")),
+                   expand = c(0.005, 0.005),
+                   name = "Date (Month-Year)") +
+      scale_y_continuous(limits = c(26.5,31), expand = c(0.01, 0), 
+                       name=(expression("Temperature"~(degree*C))),
+                       breaks = seq(26.5,31, by=0.5))+
+      theme(legend.box.background = element_rect(),
+            plot.background=element_blank(),
+            panel.grid= element_blank(),
+            legend.position = "top")+
+      
+      geom_line(aes(y = (OISST), colour = "OI_SST"), linetype=1, size=0.3, alpha=0.9) +           geom_line(aes(y = (Temperature), colour = "Insitu"), size=0.4, alpha=0.9) +
+      geom_line(aes(y = (CRWSST), colour = "CRW_SST"), linetype=1, size=0.3, alpha=0.9) +
+      geom_line(aes(y = (SST_CCI), colour = "CCI_SST"), linetype=1, size=0.3, alpha=0.9) +
+  
+      geom_hline(yintercept=MMM_OI+1, linetype="dashed", color="black")+
+      geom_hline(yintercept=MMM_InSitu+1, linetype="dashed", color="grey")+
+      geom_hline(yintercept=MMM_CRW+1, linetype="dashed", color="blue")+
+      geom_hline(yintercept=MMM_CCI+1, linetype="dashed", color="red")+
+      
+      scale_colour_manual(values = c("red", "blue4","grey", "black"), name=" Data source")
+
+#TemperatureSource
+#ggsave(file="Outputs/Sup_TemperatureSource.svg", plot=TemperatureSource, width=8, height=3.5)
+
+
+# b. OI versus In situ 
+
+  LM_OI<-lm(OISST~Temperature, data = Temperature.Wide_2014_2016)
+  summary(LM_OI)
+      
+  GCITYvsOI<-ggplot(Temperature.Wide_2014_2016, aes(x=Temperature, y=OISST)) + 
+        ggthe_bw + ggtitle("b.")+
+        theme(panel.grid= element_blank())+
+        
+        geom_abline(slope = 1, intercept = 0, colour="grey")+
+        geom_point(alpha=0.1, size=0.08)+ 
+        geom_smooth(method = lm, colour="black")+
+        geom_hline(yintercept=MMM_OI+1, linetype="dashed", color="black")+
+        geom_vline(xintercept=MMM_InSitu+1, linetype="dashed", color="black")+
+    
+        scale_y_continuous(limits = c(26,31.5), expand = c(0.01, 0), 
+                         name=(expression("OISST"~(degree*C))),
+                         breaks = seq(26,32, by=1))+
+        scale_x_continuous(limits = c(26,31.5), expand = c(0.01, 0), 
+                         name=(expression("In situ temperature"~(degree*C))),
+                         breaks = seq(26,32, by=1))+
+        annotate("text", x = 28, y = 31, 
+                 label = "OISST = 0.8 In situ + 6.9 \n R2: 0.67", 
+                 size=3)+
+        
+        annotate("text", x = c(29.5, 30.5, 29.5, 30.5), y = c(29.5, 30.5, 30.5, 29.5), label = c("I", "II", "III", "IV"))
+  #GCITYvsOI
+  # ggsave(file="Outputs/LM_OI.svg", plot=GCITYvsOI, width=4, height=3.5)
+
+
+# c. CRW versus In situ 
+
+  LM_CRW<-lm(CRWSST~Temperature, data = Temperature.Wide_2014_2016)
+  summary(LM_CRW)
+      
+  GCITYvsCRW<-ggplot(Temperature.Wide_2014_2016, aes(x=Temperature, y=CRWSST)) + 
+        ggthe_bw+ ggtitle("c.")+
+        theme(panel.grid= element_blank())+
+    
+        geom_abline(slope = 1, intercept = 0, colour="grey")+
+        geom_point(alpha=0.1, size=0.05)+ 
+        geom_smooth(method = lm, colour="blue4")+
+        geom_hline(yintercept=MMM_CRW+1, linetype="dashed", color="black")+
+        geom_vline(xintercept=MMM_InSitu+1, linetype="dashed", color="black")+
+          
+        scale_y_continuous(limits = c(26,31.5), expand = c(0.01, 0), 
+                         name=(expression("CRW"~(degree*C))),
+                         breaks = seq(26,32, by=1))+
+        scale_x_continuous(limits = c(26,31.5), expand = c(0.01, 0), 
+                         name=(expression("Insitu temperature"~(degree*C))),
+                         breaks = seq(26,32, by=1))+
+    
+        annotate("text", x = 28, y = 31, 
+                 label = "CRW = 0.6 In situ + 10.4 \n R2: 0.58",
+                 size=3)+
+        annotate("text", x = c(29.5, 30.5, 29.5, 30.5), 
+                 y = c(29.5, 30.5, 30.5, 29.5), 
+                 label = c("I", "II", "III", "IV"))
+  #GCITYvsCRW
+
+  # d. CCI versus In situ 
+
+  LM_CCI<-lm(SST_CCI~Temperature, data = Temperature.Wide_2014_2016)
+  summary(LM_CCI)
+      
+  GCITYvsCCI<-ggplot(Temperature.Wide_2014_2016, aes(x=Temperature, y=SST_CCI)) + 
+        ggthe_bw+ ggtitle("d.")+
+        theme(panel.grid= element_blank())+
+    
+        geom_abline(slope = 1, intercept = 0, colour="grey")+
+        geom_point(alpha=0.1, size=0.05)+ 
+        geom_smooth(method = lm, colour="red")+
+        geom_hline(yintercept=MMM_CCI+1, linetype="dashed", color="black")+
+        geom_vline(xintercept=MMM_InSitu+1, linetype="dashed", color="black")+
+          
+        scale_y_continuous(limits = c(26,31.5), expand = c(0.01, 0), 
+                         name=(expression("CCI SST"~(degree*C))),
+                         breaks = seq(26,32, by=1))+
+        scale_x_continuous(limits = c(26,31.5), expand = c(0.01, 0), 
+                         name=(expression("In situ temperature"~(degree*C))),
+                         breaks = seq(26,32, by=1))+
+    
+        annotate("text", x = 28, y = 31, 
+                 label = "CCI = 0.61 In situ + 11.4 \n R2: 0.63",
+                 size=3)+
+        annotate("text", x = c(29.5, 30.5, 29.5, 30.5), y = c(29.5, 30.5, 30.5, 29.5), label = c("I", "II", "III", "IV"))
+  #GCITYvsCCI
+
+# e. OI differences 
+      
+ Temperature.Wide_2014_2016$OI_Difference<-
+  (Temperature.Wide_2014_2016$OISST-Temperature.Wide_2014_2016$Temperature)
+    
+ OIResiduals<-ggplot(Temperature.Wide_2014_2016, aes(x=Temperature, y=OI_Difference)) + 
+      ggthe_bw+ ggtitle("e.")+
+      
+      geom_abline(slope = 0, intercept = 0, colour="grey")+
+      geom_point(alpha=0.1, size=0.05)+ 
+      geom_smooth(method = lm, colour="black")+
+      
+      scale_y_continuous(limits = c(-3,3), expand = c(0, 0), 
+                         name=(expression("OI difference"~(degree*C))),
+                         breaks = seq(-3,3, by=0.5))+
+      scale_x_continuous(limits = c(26,31.5), expand = c(0.01, 0), 
+                         name=(expression("In situ Temperature"~(degree*C))),
+                         breaks = seq(26,32, by=1))
+    #OIResiduals
+    #ggsave(file="Outputs/OI_Differences.svg", plot=OIResiduals, width=4, height=3.5)
+
+# f. CRW differences 
+      
+Temperature.Wide_2014_2016$CRW_Difference<-
+  (Temperature.Wide_2014_2016$CRWSST-Temperature.Wide_2014_2016$Temperature)
+    
+  CRWResiduals<-ggplot(Temperature.Wide_2014_2016, aes(x=Temperature, y=CRW_Difference)) + 
+      ggthe_bw+ ggtitle("f.")+
+      geom_abline(slope = 0, intercept = 0, colour="grey")+
+      geom_point(alpha=0.1, size=0.05)+ 
+      geom_smooth(method = lm, colour="blue4")+
+    
+    scale_y_continuous(limits = c(-3,3), expand = c(0, 0), 
+                             name=(expression("CRW difference"~(degree*C))),
+                             breaks = seq(-3,3, by=0.5))+
+    scale_x_continuous(limits = c(26,31.5), expand = c(0.01, 0), 
+                             name=(expression("Insitu Temperature"~(degree*C))),
+                             breaks = seq(26,32, by=1))
+    #CRWResiduals
+
+  # g. CCI differences 
+      
+Temperature.Wide_2014_2016$CCI_Difference<-
+  (Temperature.Wide_2014_2016$SST_CCI-Temperature.Wide_2014_2016$Temperature)
+    
+  CCIResiduals<-ggplot(Temperature.Wide_2014_2016, aes(x=Temperature, y=CCI_Difference)) + 
+      ggthe_bw+ ggtitle("g.")+
+      geom_abline(slope = 0, intercept = 0, colour="grey")+
+      geom_point(alpha=0.1, size=0.05)+ 
+      geom_smooth(method = lm, colour="red")+
+    
+    scale_y_continuous(limits = c(-3,3), expand = c(0, 0), 
+                             name=(expression("CRW difference"~(degree*C))),
+                             breaks = seq(-3,3, by=0.5))+
+    scale_x_continuous(limits = c(26,31.5), expand = c(0.01, 0), 
+                             name=(expression("Insitu Temperature"~(degree*C))),
+                             breaks = seq(26,32, by=1))
+    #CCIResiduals
+
+  
+# HS differences 
+      Temperature.Wide_2014_2016$IS_HS<-(Temperature.Wide_2014_2016$Temperature-MMM_InSitu)
+      Temperature.Wide_2014_2016$IS_HS<-ifelse(Temperature.Wide_2014_2016$IS_HS>=0,
+                                        Temperature.Wide_2014_2016$IS_HS, NA)# REMOVE NEGATIVE ANOMALIES
+      
+      Temperature.Wide_2014_2016$OI_HS<-(Temperature.Wide_2014_2016$OISST-MMM_OI)
+      Temperature.Wide_2014_2016$OI_HS<-ifelse(Temperature.Wide_2014_2016$OI_HS>=0,
+                                        Temperature.Wide_2014_2016$OI_HS, NA)# REMOVE NEGATIVE ANOMALIES
+      
+      
+      Temperature.Wide_2014_2016$CRW_HS<-(Temperature.Wide_2014_2016$CRWSST-MMM_CRW)
+      Temperature.Wide_2014_2016$CRW_HS<-ifelse(Temperature.Wide_2014_2016$CRW_HS>=0,
+                                        Temperature.Wide_2014_2016$CRW_HS, NA)# REMOVE NEGATIVE ANOMALIES
+      
+      Temperature.Wide_2014_2016$CCI_HS<-(Temperature.Wide_2014_2016$SST_CCI-MMM_CCI)
+      Temperature.Wide_2014_2016$CCI_HS<-ifelse(Temperature.Wide_2014_2016$CCI_HS>=0,
+                                        Temperature.Wide_2014_2016$CCI_HS, NA)# REMOVE NEGATIVE ANOMALIES
+
+      
+#h. OI 
+ LM_HS.OI<-lm(OI_HS~IS_HS, data = Temperature.Wide_2014_2016)
+  summary(LM_HS.OI)      
+      
+ OI_HS<-ggplot(Temperature.Wide_2014_2016, aes(x=IS_HS, y=OI_HS)) + 
+      ggthe_bw+ ggtitle("e.")+
+      theme(panel.grid= element_blank())+
+      annotate("text", x = 1, y = 1.5, 
+               label = "OI HS = 0.63 In situ + 0.2 \n R2: 0.41",
+               size=3)+
+      
+      geom_abline(slope = 1, intercept = 0, colour="grey")+
+      geom_point(alpha=0.1, size=0.3)+ 
+      geom_smooth(method = lm, colour="black")+
+      
+      scale_y_continuous(limits = c(0,2), expand = c(0.01, 0), 
+                         name=(expression("OI HS"~(degree*C))),
+                         breaks = seq(0,2, by=0.5))+
+      scale_x_continuous(limits = c(0,2), expand = c(0.01, 0), 
+                         name=(expression("Insitu HS"~(degree*C))),
+                         breaks = seq(0,2, by=0.5))
+    #OI_HS
+   
+# I. CRW HS differences 
+  LM_HS.CRW<-lm(CRW_HS~IS_HS, data = Temperature.Wide_2014_2016)
+  summary(LM_HS.CRW) 
+      
+ CRW_HS<-ggplot(Temperature.Wide_2014_2016, aes(x=IS_HS, y=CRW_HS)) + 
+      ggthe_bw+ ggtitle("f.")+
+      theme(panel.grid= element_blank())+
+      annotate("text", x = 1, y = 1.5, 
+               label = "CRW HS = 0.42 In situ + 0.25 \n R2: 0.24",
+               size=3)+
+      
+      geom_abline(slope = 1, intercept = 0, colour="grey")+
+      geom_point(alpha=0.1, size=0.3)+ 
+      geom_smooth(method = lm, colour="blue4")+
+      
+      scale_y_continuous(limits = c(0,2), expand = c(0.01, 0), 
+                         name=(expression("CRW HS"~(degree*C))),
+                         breaks = seq(0,2, by=0.5))+
+      scale_x_continuous(limits = c(0,2), expand = c(0.01, 0), 
+                         name=(expression("Insitu HS"~(degree*C))),
+                         breaks = seq(0,2, by=0.5))
+    #CRW_HS
+   
+
+# j. CCI HS differences 
+  LM_HS.CCI<-lm(CCI_HS~IS_HS, data = Temperature.Wide_2014_2016)
+  summary(LM_HS.CCI) 
+      
+ CCI_HS<-ggplot(Temperature.Wide_2014_2016, aes(x=IS_HS, y=CCI_HS)) + 
+      ggthe_bw+ ggtitle("g.")+
+      theme(panel.grid= element_blank())+
+      annotate("text", x = 1, y = 1.5, 
+               label = "CCI HS = 0.43 In situ + 0.18 \n R2: 0.29",
+               size=3)+
+      
+      geom_abline(slope = 1, intercept = 0, colour="grey")+
+      geom_point(alpha=0.1, size=0.3)+ 
+      geom_smooth(method = lm, colour="red")+
+      
+      scale_y_continuous(limits = c(0,2), expand = c(0.01, 0), 
+                         name=(expression("CCI HS"~(degree*C))),
+                         breaks = seq(0,2, by=0.5))+
+      scale_x_continuous(limits = c(0,2), expand = c(0.01, 0), 
+                         name=(expression("Insitu HS"~(degree*C))),
+                         breaks = seq(0,2, by=0.5))
+    #CCI_HS
+     
+  # k. Differences overtime 
+      
+     TemperatureSource2<-ggplot(Temperature.Wide_2014_2016, aes(x=Date)) + 
+          theme_bw() + ggtitle("f.") + geom_abline(slope = 0, intercept = 0)+
+          scale_x_date(date_breaks = "3 months", date_labels = "%m-%Y", 
+                       limits = c(as.Date("2014-08-01"), as.Date("2016-08-15")),
+                       expand = c(0.005, 0.005),
+                       name = "Month-Year") +
+          scale_y_continuous(limits = c(-3.5,3), expand = c(0.01, 0), 
+                          name=(expression("Difference Temperature"~(degree*C))),
+                           breaks = seq(-3,3, by=0.5))+
+          theme(plot.background=element_blank(),
+                panel.grid= element_blank(),
+                legend.box.background = element_rect(),
+                legend.position = c(0.48, 0.22),
+                panel.background =element_rect(fill = NA, color = "black"))+
+          
+          geom_line(aes(y = (OI_Difference), colour = "OISST"), linetype=1, size=0.3, alpha=0.9) +      
+          geom_line(aes(y = (CRW_Difference), colour = "CRW_5km"), size=0.4, alpha=0.9) +
+          geom_line(aes(y = (CCI_Difference), colour = "CCI"), size=0.4, alpha=0.9) +
+          scale_colour_manual(values = c("red", "blue4","grey"), name=" Data source")
+       #TemperatureSource2
+
+
+Sources<-grid.arrange(
+  TemperatureSource,
+  arrangeGrob(GCITYvsOI,GCITYvsCRW, GCITYvsCCI, ncol=3), 
+   #arrangeGrob(OIResiduals,CRWResiduals, CCIResiduals, ncol=3),
+   arrangeGrob(OI_HS, CRW_HS, CCI_HS, ncol=3),
+  heights=c(2/5, 1.5/5, 1.5/5), ncol = 1)
+
+# ggsave(file="C.Outputs/Figure_S1_All.svg", plot=Sources, width=7, height=7)
+
+```
+
+**Supplementary Figure S1:** Temperature comparison among different data sources. **a.** Temperature for the August 2014 - August 2016 period. **b.** Correlation between OISST (v2) data and *in situ* (3m) data. **c.** Correlation between CRW (CoralTemp v3.1) and *in situ* data. **d.** Correlation between CCI (ESA v2.1) and *in situ* data. Panels I contain SST values under the bleaching threshold for both data sets being compared (there is not accumulation of DHW). Panels II contain SST values above the bleaching threshold for both data sets being compared (both data sets accumulate of DHW). Panels III contain the cases in which satellite values were above the bleaching threshold, both not the *in situ* values (potential DHW overestimation). Panels IV contain the cases in which *in situ* values were above the bleaching threshold, both not the satellite values (potential DHW underestimation). Panels **e., f.** and **g.** Show the correlation between teh Hotspots (HS) for each satalite source compared to *in situ* data. </br>
+
 ## 5.2 SST with all data from any year with the 3 sources
+
+### Figure OI, CRW
 
 ```{r CheckSourcesBiasAll}
   Temperature.Wide.All<-Temperature.Wide[complete.cases(Temperature.Wide), ]
@@ -704,24 +1159,28 @@ TemperatureSource2<-ggplot(Temperature.Wide, aes(x=Date)) +
                        name=(expression("Temperature"~(degree*C))),
                        breaks = seq(24.5,31.5, by=0.5))+
       theme(legend.box.background = element_rect(),
-            legend.position = c(0.48, 0.22))+
+            legend.position = c(0.48, 0.22),
+             panel.grid= element_blank())+
       
-      geom_line(aes(y = (OISST), colour = "OI_SST"), linetype=1, size=0.2, alpha=0.8) +      
-      geom_line(aes(y = (Temperature), colour = "In situ"), size=0.2, alpha=0.8) +
-      geom_line(aes(y = (CRWSST), colour = "CRW_SST"), linetype=1, size=0.2, alpha=0.8) +
-      geom_hline(yintercept=MMM_OI+1, linetype="dashed", color="black")+
+      geom_line(aes(y = (SST_CCI), colour = "CCI_SST"), linetype=1, size=0.1, alpha=0.8) +  
+      geom_line(aes(y = (OISST), colour = "OI_SST"), linetype=1, size=0.1, alpha=0.8) +
+      geom_line(aes(y = (Temperature), colour = "In situ"), size=0.1, alpha=0.8) +
+      geom_line(aes(y = (CRWSST), colour = "CRW_SST"), linetype=1, size=0.1, alpha=0.8) +
+      
+  geom_hline(yintercept=MMM_OI+1, linetype="dashed", color="black")+
       geom_hline(yintercept=MMM_InSitu+1, linetype="dashed", color="grey")+
       geom_hline(yintercept=MMM_CRW+1, linetype="dashed", color="blue")+
-      scale_colour_manual(values = c("blue4","grey","black"), name=" Data source")
+      scale_colour_manual(values = c("red", "blue4","grey","black"), name=" Data source")
 # TemperatureSource2
 
 # b. OI versus In situ 
 
-  LM_OI2<-lm(OISST~Temperature, data = Temperature.Wide)
+  LM_OI2<-lm(OISST~Temperature, data = Temperature.Wide.All)
   summary(LM_OI2)
       
   GCITYvsOI2<-ggplot(Temperature.Wide, aes(x=Temperature, y=OISST)) + 
         ggthe_bw + ggtitle("b.")+
+        theme(panel.grid= element_blank())+
         
         geom_abline(slope = 1, intercept = 0, colour="grey")+
         geom_point(alpha=0.1, size=0.05)+ 
@@ -733,7 +1192,7 @@ TemperatureSource2<-ggplot(Temperature.Wide, aes(x=Date)) +
                          name=(expression("OISST"~(degree*C))),
                          breaks = seq(25,32, by=1))+
         scale_x_continuous(limits = c(25,31.5), expand = c(0.01, 0), 
-                         name=(expression("In situ temperature"~(degree*C))),
+                         name=(expression("Insitu temperature"~(degree*C))),
                          breaks = seq(25,32, by=1))+
         annotate("text", x = 28, y = 31, label = "OISST = 0.8 In situ + 5.8 \n R2: 0.58") +
         annotate("text", x = c(29.5, 30.5, 29.5, 30.5), y = c(29.5, 30.5, 30.5, 29.5), label = c("I", "II", "III", "IV"))
@@ -741,11 +1200,12 @@ TemperatureSource2<-ggplot(Temperature.Wide, aes(x=Date)) +
   
 # c. CRW versus In situ 
 
-  LM_CRW2<-lm(CRWSST~Temperature, data = Temperature.Wide)
+  LM_CRW2<-lm(CRWSST~Temperature, data = Temperature.Wide.All)
   summary(LM_CRW2)
       
   GCITYvsCRW2<-ggplot(Temperature.Wide, aes(x=Temperature, y=CRWSST)) + 
         ggthe_bw + ggtitle("c.")+
+        theme(panel.grid= element_blank())+
         
         geom_abline(slope = 1, intercept = 0, colour="grey")+
         geom_point(alpha=0.1, size=0.05)+ 
@@ -757,11 +1217,37 @@ TemperatureSource2<-ggplot(Temperature.Wide, aes(x=Date)) +
                          name=(expression("CRW"~(degree*C))),
                          breaks = seq(25,32, by=1))+
         scale_x_continuous(limits = c(25,31.5), expand = c(0.01, 0), 
-                         name=(expression("In situ temperature"~(degree*C))),
+                         name=(expression("Insitu temperature"~(degree*C))),
                          breaks = seq(25,32, by=1))+
         annotate("text", x = 28, y = 31, label = "CRW = 0.7 In situ + 7.9 \n R2: 0.67")+
-        annotate("text", x = c(29.5, 30.5, 29.5, 30.5), y = c(29.5, 30.5, 30.5, 29.5), label = c("I", "II", "III", "IV"))
+        annotate("text", x = c(29.5, 30.5, 29.5, 30.5), y = c(29.5, 30.5, 30.5, 29.5), 
+                 label = c("I", "II", "III", "IV"))
   # GCITYvsCRW2
+  
+  # c. CCI versus In situ 
+
+  LM_CCI2<-lm(SST_CCI~Temperature, data = Temperature.Wide.All)
+  summary(LM_CCI2)
+      
+  GCITYvsCCI2<-ggplot(Temperature.Wide, aes(x=Temperature, y=SST_CCI)) + 
+        ggthe_bw + ggtitle("c.")+
+        theme(panel.grid= element_blank())+
+        
+        geom_abline(slope = 1, intercept = 0, colour="grey")+
+        geom_point(alpha=0.1, size=0.05)+ 
+        geom_smooth(method = lm, colour="red")+
+        geom_hline(yintercept=MMM_CRW+1, linetype="dashed", color="black")+
+        geom_vline(xintercept=MMM_InSitu+1, linetype="dashed", color="black")+
+    
+        scale_y_continuous(limits = c(25,31.5), expand = c(0.01, 0), 
+                         name=(expression("CRW"~(degree*C))),
+                         breaks = seq(25,32, by=1))+
+        scale_x_continuous(limits = c(25,31.5), expand = c(0.01, 0), 
+                         name=(expression("In situ temperature"~(degree*C))),
+                         breaks = seq(25,32, by=1))+
+        annotate("text", x = 28, y = 31, label = "CCI = 0.7 Insitu + 9.8 \n R2: 0.65")+
+        annotate("text", x = c(29.5, 30.5, 29.5, 30.5), y = c(29.5, 30.5, 30.5, 29.5), label = c("I", "II", "III", "IV"))
+  # GCITYvsCCI2
 
 
 # d. OI differences 
@@ -816,6 +1302,224 @@ Sources2<-grid.arrange(
 
 ```
 
+
+### Figure OI, CRW, CCI
+
+```{r CheckSourcesBiasall_PlotsAllSource, echo=FALSE}
+
+TemperatureSource3<-ggplot(Temperature.Wide, aes(x=Date)) + 
+      ggthe_bw + ggtitle("a.") +
+      scale_x_date(date_breaks = "12 months", date_labels = "%y", 
+                   limits = c(as.Date("1985-01-01"), as.Date("2016-12-31")),
+                   expand = c(0.005, 0.005),
+                   name = "Year") +
+      scale_y_continuous(limits = c(24.5,31.5), expand = c(0.01, 0), 
+                       name=(expression("Temperature"~(degree*C))),
+                       breaks = seq(24.5,31.5, by=0.5))+
+      theme(legend.box.background = element_rect(),
+            legend.position = "top",
+             panel.grid= element_blank())+
+      
+      geom_line(aes(y = (SST_CCI), colour = "CCI_SST"), linetype=1, size=0.1, alpha=0.8) +  
+      geom_line(aes(y = (OISST), colour = "OI_SST"), linetype=1, size=0.1, alpha=0.8) +
+      geom_line(aes(y = (Temperature), colour = "In situ"), size=0.1, alpha=0.8) +
+      geom_line(aes(y = (CRWSST), colour = "CRW_SST"), linetype=1, size=0.1, alpha=0.8) +
+      
+      geom_hline(yintercept=MMM_OI+1, linetype="dashed", color="black")+
+      geom_hline(yintercept=MMM_InSitu+1, linetype="dashed", color="grey")+
+      geom_hline(yintercept=MMM_CRW+1, linetype="dashed", color="blue")+
+      geom_hline(yintercept=MMM_CCI+1, linetype="dashed", color="red")+
+      scale_colour_manual(values = c("red", "blue4","grey","black"), name=" Data source")
+# TemperatureSource3
+
+# b. OI versus In situ 
+
+  LM_OI3<-lm(OISST~Temperature, data = Temperature.Wide.All)
+  summary(LM_OI3)
+      
+  GCITYvsOI3<-ggplot(Temperature.Wide, aes(x=Temperature, y=OISST)) + 
+        ggthe_bw + ggtitle("b.")+
+        theme(panel.grid= element_blank())+
+        
+        geom_abline(slope = 1, intercept = 0, colour="grey")+
+        geom_point(alpha=0.1, size=0.05)+ 
+        geom_smooth(method = lm, colour="black")+
+        geom_hline(yintercept=MMM_OI+1, linetype="dashed", color="black")+
+        geom_vline(xintercept=MMM_InSitu+1, linetype="dashed", color="black")+
+    
+        scale_y_continuous(limits = c(25,31.5), expand = c(0.01, 0), 
+                         name=(expression("OISST"~(degree*C))),
+                         breaks = seq(25,32, by=1))+
+        scale_x_continuous(limits = c(25,31.5), expand = c(0.01, 0), 
+                         name=(expression("Insitu temperature"~(degree*C))),
+                         breaks = seq(25,32, by=1))+
+        annotate("text", x = 28, y = 31, 
+                 label = "OISST = 0.8 In situ + 5.8 \n R2: 0.58",
+                 size=3) +
+        annotate("text", x = c(29.5, 30.5, 29.5, 30.5), 
+                 y = c(29.5, 30.5, 30.5, 29.5), label = c("I", "II", "III", "IV"))
+  #GCITYvsOI3
+  
+# c. CRW versus In situ 
+
+  LM_CRW3<-lm(CRWSST~Temperature, data = Temperature.Wide.All)
+  summary(LM_CRW3)
+      
+  GCITYvsCRW3<-ggplot(Temperature.Wide, aes(x=Temperature, y=CRWSST)) + 
+        ggthe_bw + ggtitle("c.")+
+        theme(panel.grid= element_blank())+
+        
+        geom_abline(slope = 1, intercept = 0, colour="grey")+
+        geom_point(alpha=0.1, size=0.05)+ 
+        geom_smooth(method = lm, colour="blue4")+
+        geom_hline(yintercept=MMM_CRW+1, linetype="dashed", color="black")+
+        geom_vline(xintercept=MMM_InSitu+1, linetype="dashed", color="black")+
+    
+        scale_y_continuous(limits = c(25,31.5), expand = c(0.01, 0), 
+                         name=(expression("CRW"~(degree*C))),
+                         breaks = seq(25,32, by=1))+
+        scale_x_continuous(limits = c(25,31.5), expand = c(0.01, 0), 
+                         name=(expression("Insitu temperature"~(degree*C))),
+                         breaks = seq(25,32, by=1))+
+        annotate("text", x = 28, y = 31, 
+                 label = "CRW = 0.7 In situ + 7.9 \n R2: 0.67",
+                 size=3)+
+        annotate("text", x = c(29.5, 30.5, 29.5, 30.5), y = c(29.5, 30.5, 30.5, 29.5), 
+                 label = c("I", "II", "III", "IV"))
+  # GCITYvsCRW3
+  
+  # d. CCI versus In situ 
+
+  LM_CCI3<-lm(SST_CCI~Temperature, data = Temperature.Wide.All)
+  summary(LM_CCI3)
+      
+  GCITYvsCCI3<-ggplot(Temperature.Wide, aes(x=Temperature, y=SST_CCI)) + 
+        ggthe_bw + ggtitle("d.")+
+        theme(panel.grid= element_blank())+
+        
+        geom_abline(slope = 1, intercept = 0, colour="grey")+
+        geom_point(alpha=0.1, size=0.05)+ 
+        geom_smooth(method = lm, colour="red")+
+        geom_hline(yintercept=MMM_CRW+1, linetype="dashed", color="black")+
+        geom_vline(xintercept=MMM_InSitu+1, linetype="dashed", color="black")+
+    
+        scale_y_continuous(limits = c(25,31.5), expand = c(0.01, 0), 
+                         name=(expression("CRW"~(degree*C))),
+                         breaks = seq(25,32, by=1))+
+        scale_x_continuous(limits = c(25,31.5), expand = c(0.01, 0), 
+                         name=(expression("In situ temperature"~(degree*C))),
+                         breaks = seq(25,32, by=1))+
+        annotate("text", x = 28, y = 31, 
+                 label = "CCI = 0.7 Insitu + 9.8 \n R2: 0.65",
+                 size=3)+
+        annotate("text", x = c(29.5, 30.5, 29.5, 30.5),
+                 y = c(29.5, 30.5, 30.5, 29.5), 
+                 label = c("I", "II", "III", "IV"))
+  # GCITYvsCCI3
+
+
+  # HS differences 
+      Temperature.Wide.All$IS_HS<-(Temperature.Wide.All$Temperature-MMM_InSitu)
+      Temperature.Wide.All$IS_HS<-ifelse(Temperature.Wide.All$IS_HS>=0,
+                                        Temperature.Wide.All$IS_HS, NA)# REMOVE - ANOMALIES
+      
+      Temperature.Wide.All$OI_HS<-(Temperature.Wide.All$OISST-MMM_OI)
+      Temperature.Wide.All$OI_HS<-ifelse(Temperature.Wide.All$OI_HS>=0,
+                                        Temperature.Wide.All$OI_HS, NA)# REMOVE - ANOMALIES
+      
+      
+      Temperature.Wide.All$CRW_HS<-(Temperature.Wide.All$CRWSST-MMM_CRW)
+      Temperature.Wide.All$CRW_HS<-ifelse(Temperature.Wide.All$CRW_HS>=0,
+                                        Temperature.Wide.All$CRW_HS, NA)# REMOVE-ANOMALIES
+      
+      Temperature.Wide.All$CCI_HS<-(Temperature.Wide.All$SST_CCI-MMM_CCI)
+      Temperature.Wide.All$CCI_HS<-ifelse(Temperature.Wide.All$CCI_HS>=0,
+                                        Temperature.Wide.All$CCI_HS, NA)# REMOVE -ANOMALIES
+
+      
+#e. OI 
+ LM_HS.OI3<-lm(OI_HS~IS_HS, data = Temperature.Wide.All)
+  summary(LM_HS.OI3)      
+      
+ OI_HS3<-ggplot(Temperature.Wide.All, aes(x=IS_HS, y=OI_HS)) + 
+      ggthe_bw+ ggtitle("e.")+
+      theme(panel.grid= element_blank())+
+      annotate("text", x = 1, y = 1.5, 
+               label = "OI HS = 0.54 In situ + 0.2 \n R2: 0.32",
+               size=3)+
+      
+      geom_abline(slope = 1, intercept = 0, colour="grey")+
+      geom_point(alpha=0.1, size=0.3)+ 
+      geom_smooth(method = lm, colour="black")+
+      
+      scale_y_continuous(limits = c(0,2), expand = c(0.01, 0), 
+                         name=(expression("OI HS"~(degree*C))),
+                         breaks = seq(0,2, by=0.5))+
+      scale_x_continuous(limits = c(0,2), expand = c(0.01, 0), 
+                         name=(expression("Insitu HS"~(degree*C))),
+                         breaks = seq(0,2, by=0.5))
+    #OI_HS3
+   
+# I. CRW HS differences 
+  LM_HS.CRW3<-lm(CRW_HS~IS_HS, data = Temperature.Wide.All)
+  summary(LM_HS.CRW3) 
+      
+ CRW_HS3<-ggplot(Temperature.Wide.All, aes(x=IS_HS, y=CRW_HS)) + 
+      ggthe_bw+ ggtitle("f.")+
+      theme(panel.grid= element_blank())+
+      annotate("text", x = 1, y = 1.5, 
+               label = "CRW HS = 0.52 In situ + 0.2 \n R2: 0.36",
+               size=3)+
+      
+      geom_abline(slope = 1, intercept = 0, colour="grey")+
+      geom_point(alpha=0.1, size=0.3)+ 
+      geom_smooth(method = lm, colour="blue4")+
+      
+      scale_y_continuous(limits = c(0,2), expand = c(0.01, 0), 
+                         name=(expression("CRW HS"~(degree*C))),
+                         breaks = seq(0,2, by=0.5))+
+      scale_x_continuous(limits = c(0,2), expand = c(0.01, 0), 
+                         name=(expression("Insitu HS"~(degree*C))),
+                         breaks = seq(0,2, by=0.5))
+    #CRW_HS3
+   
+
+# j. CCI HS differences 
+  LM_HS.CCI3<-lm(CCI_HS~IS_HS, data = Temperature.Wide.All)
+  summary(LM_HS.CCI3) 
+      
+ CCI_HS3<-ggplot(Temperature.Wide.All, aes(x=IS_HS, y=CCI_HS)) + 
+      ggthe_bw+ ggtitle("g.")+
+      theme(panel.grid= element_blank())+
+      annotate("text", x = 1, y = 1.5, 
+               label = "CCI HS = 0.47 In situ + 0.18 \n R2: 0.33",
+               size=3)+
+      
+      geom_abline(slope = 1, intercept = 0, colour="grey")+
+      geom_point(alpha=0.1, size=0.3)+ 
+      geom_smooth(method = lm, colour="red")+
+      
+      scale_y_continuous(limits = c(0,2), expand = c(0.01, 0), 
+                         name=(expression("CCI HS"~(degree*C))),
+                         breaks = seq(0,2, by=0.5))+
+      scale_x_continuous(limits = c(0,2), expand = c(0.01, 0), 
+                         name=(expression("Insitu HS"~(degree*C))),
+                         breaks = seq(0,2, by=0.5))
+    #CCI_HS3
+     
+  
+Sources3<-grid.arrange(
+  TemperatureSource3,
+  arrangeGrob(GCITYvsOI3,GCITYvsCRW3, GCITYvsCCI3, ncol=3), 
+   #arrangeGrob(OIResiduals,CRWResiduals, CCIResiduals, ncol=3),
+   arrangeGrob(OI_HS3, CRW_HS3, CCI_HS3, ncol=3),
+  heights=c(2/5, 1.5/5, 1.5/5), ncol = 1)
+
+#ggsave(file="Outputs/TemperatureSourcess3.svg", plot=Sources2, width=7, height=8)
+
+```
+
+
 ## 5.3 DHW with data from 2014-2016
 
 ```{r CheckDHWSorcesBias2014_2016Data}
@@ -851,10 +1555,10 @@ Wide.data.DHW2<-reshape(Wide.data.DHW,
       theme(legend.box.background = element_rect(),
             legend.position = c(0.15, 0.7))+
       
-      geom_line(aes(y = (DHW.OI_SST), colour = "OISST"), linetype=1, size=0.3, alpha=0.9) +      
+      geom_line(aes(y = (DHW.OI_SST), colour = "OISST"), linetype=1, size=0.3, alpha=0.9) +       geom_line(aes(y = (DHW.CCI_SST), colour = "CCI"), size=0.4, alpha=0.9) +
       geom_line(aes(y = (DHW.In_situ), colour = "In situ"), size=0.4, alpha=0.9) +
       geom_line(aes(y = (DHW.CRW_SST), colour = "CRW"), linetype=1, size=0.3, alpha=0.9) +
-      scale_colour_manual(values = c("blue4","grey","black"), name=" Data source")
+      scale_colour_manual(values = c("red","blue4","grey","black"), name=" Data source")
     #DHWSource
     #ggsave(file="Outputs/Sup_DHW.Source.svg", plot=DHWSource, width=8, height=3.5)
 
@@ -878,7 +1582,9 @@ Wide.data.DHW2<-reshape(Wide.data.DHW,
                          name=(expression("In situ DHW"~(degree*C~-weeks))),
                          breaks = seq(0,9, by=1))+
      
-      annotate("text", x = 4.2, y = 8.2, label = "OISST_DHW = 0.9 (In situ_DHW) - 0.4 \n R2: 0.9")
+      annotate("text", x = 4.2, y = 8.2,
+               label = "OISST_DHW = 0.9 (In situ_DHW) - 0.4 \n R2: 0.9",
+               size=3)
     #GCITYvsOI_DHW
     # ggsave(file="Outputs/DWH_IS_OI.svg", plot=GCITYvsOI, width=4, height=3.5)
 
@@ -901,18 +1607,43 @@ Wide.data.DHW2<-reshape(Wide.data.DHW,
       scale_x_continuous(limits = c(0,9), expand = c(0.01, 0), 
                          name=(expression("In situ DHW "~(degree*C~-weeks))),
                          breaks = seq(0,10, by=1))+
-      annotate("text", x = 4.2, y = 8.2, label = "CRW_DHW = 0.4 (In situ_DHW) + 0.1 \n R2: 0.4")
+      annotate("text", x = 4.2, y = 8.2, 
+               label = "CRW_DHW = 0.4 (In situ_DHW) + 0.1 \n R2: 0.4",
+               size=3)
     #GCITYvsCRW_DHW
     #ggsave(file="Outputs/DWH_IS_CRW.svg", plot=GCITYvsCRW_DHW, width=4, height=3.5)
 
+# d. CCI versus In situ 
 
-# d. OI differences 
+    LM_CCI_DHW<-lm(DHW.CCI_SST~DHW.In_situ, data = Wide.data.DHW2)
+    summary(LM_CCI_DHW)
+    
+    GCITYvsCCI_DHW<-ggplot(Wide.data.DHW2, aes(x=DHW.In_situ, y=DHW.CCI_SST)) + 
+      ggthe_bw + ggtitle("d.")+
+      
+      geom_abline(slope = 1, intercept = 0, colour="grey")+ 
+      geom_point(alpha=0.5, size=1)+ 
+      geom_smooth(method = lm, colour="red")+
+      
+      scale_y_continuous(limits = c(0,9), expand = c(0.01, 0), 
+                         name=(expression("CRW DHW"~(degree*C~-weeks))),
+                         breaks = seq(0,10, by=1))+
+      scale_x_continuous(limits = c(0,9), expand = c(0.01, 0), 
+                         name=(expression("In situ DHW "~(degree*C~-weeks))),
+                         breaks = seq(0,10, by=1))+
+      annotate("text", x = 4.2, y = 8.2, 
+               label = "CCI_DHW = 0.12 (In situ_DHW) + 0.1 \n R2: 0.4",
+               size=3)
+    #GCITYvsCCI_DHW
+    
+    
+# e. OI differences 
 
     Wide.data.DHW2$OI_Difference<-
       (Wide.data.DHW2$DHW.OI_SST-Wide.data.DHW2$DHW.In_situ)
     
     OI_DWH_Residuals<-ggplot(Wide.data.DHW2, aes(x=DHW.In_situ, y=OI_Difference)) + 
-      ggthe_bw+ ggtitle("d.") +
+      ggthe_bw+ ggtitle("e.") +
       
       geom_abline(slope = 0, intercept = 0, colour="grey") +
       geom_point(alpha=0.5, size=1)+ 
@@ -928,7 +1659,7 @@ Wide.data.DHW2<-reshape(Wide.data.DHW,
     #ggsave(file="Outputs/OI_DHW_Differences.svg", plot=OI_DWH_Residuals, width=4, height=3.5)
 
     
-# e. OI differences 
+# f. OI differences 
 
     Wide.data.DHW2$CRW_Difference<-
       (Wide.data.DHW2$DHW.CRW_SST-Wide.data.DHW2$DHW.In_situ)
@@ -950,13 +1681,14 @@ Wide.data.DHW2<-reshape(Wide.data.DHW,
     #ggsave(file="Outputs/CRW_DHW_Differences.svg", plot=CRW_DWH_Residuals, width=4, height=3.5)
 
 
-Sources3<-grid.arrange(
-  DHWSource, arrangeGrob(GCITYvsOI_DHW,GCITYvsCRW_DHW, ncol=2), heights=c(5/10, 5/10), ncol = 1)
+Sources4<-grid.arrange(
+  DHWSource, arrangeGrob(GCITYvsOI_DHW,GCITYvsCRW_DHW, GCITYvsCCI_DHW, ncol=3),
+  heights=c(5/10, 5/10), ncol = 1)
 
-#ggsave(file="C.Outputs/Figure_S2.svg", plot=Sources3, width=7, height=7)
+#ggsave(file="C.Outputs/Figure_S2.svg", plot=Sources3, width=8, height=7)
 ```
 
-**Supplementary Figure S2:** Degree heating weeks (DHW) index comparison among different data sources. **a.** DHW calculated for November 2014 - August 2016. **b.** Correlation between OISST derived in situ derived DHW indices. **c.** Correlation between CRW (CoralTemp v3.1) derived and in situ derived DHW indices. </br> 
+**Supplementary Figure S2:** Degree heating weeks (DHW) index comparison among different data sources. **a.** DHW calculated for November 2014 - August 2016. **b.** Correlation between OISST derived in situ derived DHW indices. **c.** Correlation between CRW (CoralTemp v3.1) derived and in situ derived DHW indices.  **d.** Correlation between CIISST derived in situ derived DHW indices. </br> 
 
 ## 5.4 DHW with all DHW data available for all 3 sources
 
@@ -994,8 +1726,9 @@ Sources3<-grid.arrange(
       
       geom_line(aes(y = (DHW.OI_SST), colour = "OISST"), linetype=1, size=0.3, alpha=0.9) +      
       geom_line(aes(y = (DHW.In_situ), colour = "In situ"), size=0.4, alpha=0.9) +
+      geom_line(aes(y = (DHW.CCI_SST), colour = "CCI"), size=0.4, alpha=0.9) +
       geom_line(aes(y = (DHW.CRW_SST), colour = "CRW"), linetype=1, size=0.3, alpha=0.9) +
-      scale_colour_manual(values = c("blue4","grey","black"), name=" Data source")
+      scale_colour_manual(values = c("red", "blue4","grey","black"), name=" Data source")
     #DHWSource2
     #ggsave(file="Outputs/Sup_DHW_Source2.svg", plot=DHWSource2, width=8, height=3.5)
 
@@ -1019,7 +1752,9 @@ Sources3<-grid.arrange(
                          name=(expression("In situ DHW"~(degree*C~-weeks))),
                          breaks = seq(0,9, by=1))+
      
-      annotate("text", x = 4.2, y = 8.2, label = "OISST_DHW = 0.8 (In situ_DHW) + 0.1 \n R2: 0.9")
+      annotate("text", x = 4.2, y = 8.2, 
+               label = "OISST_DHW = 0.8 (In situ_DHW) + 0.1 \n R2: 0.9",
+               size=3)
     #GCITYvsOI_DHW2
     # ggsave(file="Outputs/DHW_IS_OI_2.svg", plot=GCITYvsOI_DHW2, width=4, height=3.5)
 
@@ -1042,8 +1777,35 @@ Sources3<-grid.arrange(
       scale_x_continuous(limits = c(0,9), expand = c(0.01, 0), 
                          name=(expression("In situ DHW "~(degree*C~-weeks))),
                          breaks = seq(0,10, by=1))+
-      annotate("text", x = 4.2, y = 8.2, label = "CRW_DHW = 0.5 (In situ_DHW) \n R2: 0.6")
+      annotate("text", x = 4.2, y = 8.2, 
+               label = "CRW_DHW = 0.5 (In situ_DHW) \n R2: 0.6",
+               size=3)
     #GCITYvsCRW_DHW2
+    #ggsave(file="Outputs/DHW_IS_CRW_2.svg", plot=GCITYvsCRW_DHW2, width=4, height=3.5)
+
+
+# d. CCI versus In situ 
+
+    LM_CCI_DHW2<-lm(DHW.CCI_SST~DHW.In_situ, data = Wide.data.DHW3)
+    summary(LM_CCI_DHW2)
+    
+    GCITYvsCCI_DHW2<-ggplot(Wide.data.DHW3, aes(x=DHW.In_situ, y=DHW.CCI_SST)) + 
+      ggthe_bw + ggtitle("d.")+
+      
+      geom_abline(slope = 1, intercept = 0, colour="grey")+ 
+      geom_point(alpha=0.5, size=1)+ 
+      geom_smooth(method = lm, colour="red")+
+      
+      scale_y_continuous(limits = c(0,9), expand = c(0.01, 0), 
+                         name=(expression("CRW DHW"~(degree*C~-weeks))),
+                         breaks = seq(0,10, by=1))+
+      scale_x_continuous(limits = c(0,9), expand = c(0.01, 0), 
+                         name=(expression("In situ DHW "~(degree*C~-weeks))),
+                         breaks = seq(0,10, by=1))+
+      annotate("text", x = 4.2, y = 8.2, 
+               label = "CCI_DHW = 0.2 (In situ_DHW) + 0.1 \n R2: 0.3",
+               size=3)
+    #GCITYvsCCI_DHW2
     #ggsave(file="Outputs/DHW_IS_CRW_2.svg", plot=GCITYvsCRW_DHW2, width=4, height=3.5)
 
 
@@ -1092,7 +1854,7 @@ Sources3<-grid.arrange(
 
 
 Sources4<-grid.arrange(
-  DHWSource2, arrangeGrob(GCITYvsOI_DHW2,GCITYvsCRW_DHW2, ncol=2), heights=c(5/10, 5/10), ncol = 1)
+  DHWSource2, arrangeGrob(GCITYvsOI_DHW2,GCITYvsCRW_DHW2, GCITYvsCCI_DHW2, ncol=3), heights=c(5/10, 5/10), ncol = 1)
 
 #ggsave(file="Outputs/DHW_Sourcess2.svg", plot=Sources4, width=7, height=8)
 ```
