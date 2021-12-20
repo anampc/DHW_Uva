@@ -29,3 +29,10 @@ README.html
 # Mexico SST data files
 **/B.Temperature_data/*/*
 .Rproj.user
+
+# .svg and .eps figures
+/C.Outputs/*.svg
+/C.Outputs/*.eps
+
+C.Outputs/*.svg
+C.Outputs/*.eps
