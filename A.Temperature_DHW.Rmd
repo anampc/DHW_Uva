@@ -2021,6 +2021,7 @@ Uva.Future$Difference<-Uva.Future$Max.DHW-Uva.Future$Max.DHW.MMM.1
 ```
 
 ### Figure S7?
+
 ```{r}
 DHW_future<-ggplot(Uva.Future) + 
       geom_line(aes(x=Year, y=Max.DHW.MMM.1), 
