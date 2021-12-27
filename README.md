@@ -35,9 +35,10 @@ Directory containing data files in .csv format with the temperature data for Uva
 Directory containing figure files related with temperature and DHW included on the paper.
 
 * Figure 1a and 2a
-* Figure S1
-* Figure S2 
-* Figure S3
+* Figure S4
+* Figure S5 
+* Figure S6
+* Figure S7
 
 </br>
 

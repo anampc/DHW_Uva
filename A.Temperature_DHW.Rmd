@@ -616,7 +616,7 @@ Figure2AllSources<-grid.arrange(TemperaturePlotAll, DHWPlot, nrow=2, heights=c(6
   cor_CRW<-cor(Temperature.Wide_2014_2016$Temperature, Temperature.Wide_2014_2016$CRWSST)
 ```
 
-### Figure S3 - OI CRW
+### Figure S4 - OI, CRW
 
 ```{r CheckSorcesBias2014_2016_Plots, echo=FALSE}
 
@@ -819,9 +819,9 @@ Sources<-grid.arrange(
 
 ```
 
-**Supplementary Figure S1:** Temperature comparison among different data sources. **a.** Temperature for the August 2014 - August 2016 period. **b.** Correlation between OISST (v2) data and *in situ* (3m) data. **c.** Correlation between CRW (CoralTemp v3.1) and *in situ* data. Panels I contain SST values under the bleaching threshold for both data sets being compared (there is not accumulation of DHW). Panels II contain SST values above the bleaching threshold for both data sets being compared (both data sets accumulate of DHW). Panels III contain the cases in which satellite values were above the bleaching threshold, both not the *in situ* values (potential DHW overestimation). Panels IV contain the cases in which *in situ* values were above the bleaching threshold, both not the satellite values (potential DHW underestimation). </br> 
+**Supplementary Figure S4:** Temperature comparison among different data sources. **a.** Temperature for the August 2014 - August 2016 period. **b.** Correlation between OISST (v2) data and *in situ* (3m) data. **c.** Correlation between CRW (CoralTemp v3.1) and *in situ* data. Panels I contain SST values under the bleaching threshold for both data sets being compared (there is not accumulation of DHW). Panels II contain SST values above the bleaching threshold for both data sets being compared (both data sets accumulate of DHW). Panels III contain the cases in which satellite values were above the bleaching threshold, both not the *in situ* values (potential DHW overestimation). Panels IV contain the cases in which *in situ* values were above the bleaching threshold, both not the satellite values (potential DHW underestimation). </br> 
 
-### Figure S3 - OI, CRW, CCI
+### Figure S4 - OI, CRW, CCI
 
 ```{r CheckSorcesBias2014_2016_PlotsAll, echo=FALSE}
 
@@ -1126,7 +1126,7 @@ Sources<-grid.arrange(
 
 ```
 
-**Supplementary Figure S1:** Temperature comparison among different data sources. **a.** Temperature for the August 2014 - August 2016 period. **b.** Correlation between OISST (v2) data and *in situ* (3m) data. **c.** Correlation between CRW (CoralTemp v3.1) and *in situ* data. **d.** Correlation between CCI (ESA v2.1) and *in situ* data. Panels I contain SST values under the bleaching threshold for both data sets being compared (there is not accumulation of DHW). Panels II contain SST values above the bleaching threshold for both data sets being compared (both data sets accumulate of DHW). Panels III contain the cases in which satellite values were above the bleaching threshold, both not the *in situ* values (potential DHW overestimation). Panels IV contain the cases in which *in situ* values were above the bleaching threshold, both not the satellite values (potential DHW underestimation). Panels **e., f.** and **g.** Show the correlation between teh Hotspots (HS) for each satalite source compared to *in situ* data. </br>
+**Supplementary Figure S4:** Temperature comparison among different data sources. **a.** Temperature for the August 2014 - August 2016 period. **b.** Correlation between OISST (v2) data and *in situ* (3m) data. **c.** Correlation between CRW (CoralTemp v3.1) and *in situ* data. **d.** Correlation between CCI (ESA v2.1) and *in situ* data. Panels I contain SST values under the bleaching threshold for both data sets being compared (there is not accumulation of DHW). Panels II contain SST values above the bleaching threshold for both data sets being compared (both data sets accumulate of DHW). Panels III contain the cases in which satellite values were above the bleaching threshold, both not the *in situ* values (potential DHW overestimation). Panels IV contain the cases in which *in situ* values were above the bleaching threshold, both not the satellite values (potential DHW underestimation). Panels **e., f.** and **g.** Show the correlation between teh Hotspots (HS) for each satalite source compared to *in situ* data. </br>
 
 ## 5.2 SST with all data from any year with the 3 sources
 
@@ -1298,7 +1298,6 @@ Sources2<-grid.arrange(
 #ggsave(file="Outputs/TemperatureSourcess2.svg", plot=Sources2, width=7, height=8)
 
 ```
-
 
 ### Figure OI, CRW, CCI
 
@@ -1516,7 +1515,6 @@ Sources3<-grid.arrange(
 
 ```
 
-
 ## 5.3 DHW with data from 2014-2016
 
 ```{r CheckDHWSorcesBias2014_2016Data}
@@ -1542,7 +1540,7 @@ Wide.data.DHW2<-Wide.data.DHW2[complete.cases (Wide.data.DHW2),]
 #tail(Wide.data.DHW2)
 ```
 
-### Figure S4
+### Figure S5
 
 ```{r CheckDWHSorcesBias2014_2016_Plots, echo=FALSE}
 
@@ -1697,7 +1695,7 @@ Sources4<-grid.arrange(
 #ggsave(file="C.Outputs/Figure_S4.svg", plot=Sources4, width=7, height=4.5)
 ```
 
-**Supplementary Figure S4:** Degree heating weeks (DHW) index comparison among different data sources. **a.** DHW calculated for November 2014 - August 2016. **b.** Correlation between OISST derived in situ derived DHW indices. **c.** Correlation between CRW (CoralTemp v3.1) derived and in situ derived DHW indices.  **d.** Correlation between CIISST derived in situ derived DHW indices. </br> 
+**Supplementary Figure S5:** Degree heating weeks (DHW) index comparison among different data sources. **a.** DHW calculated for November 2014 - August 2016. **b.** Correlation between OISST derived in situ derived DHW indices. **c.** Correlation between CRW (CoralTemp v3.1) derived and in situ derived DHW indices.  **d.** Correlation between CIISST derived in situ derived DHW indices. </br> 
 
 ## 5.4 DHW with all DHW data available for all 3 sources
 
@@ -1870,10 +1868,10 @@ Sources4<-grid.arrange(
 
 ## 5.5 CCI vs OI DHW all ENSOS
 
-### Figure S5
+### Figure S6
 
 ```{r}
-FigureS5a<-ggplot(Nino.OI_data, aes(x=Days)) + ggtitle("a.")+ ggthe_bw+
+FigureS6a<-ggplot(Nino.OI_data, aes(x=Days)) + ggtitle("a.")+ ggthe_bw+
   theme(legend.box.background = element_rect(),
         legend.position = c(0.25, 0.75),
          panel.grid= element_blank()) +
@@ -1890,7 +1888,7 @@ FigureS5a<-ggplot(Nino.OI_data, aes(x=Days)) + ggtitle("a.")+ ggthe_bw+
   scale_colour_manual(values = c("magenta","cyan", "black"), name="ENSO")
 #FigureS5a
 
-FigureS5b<-ggplot(Nino.CCI_data, aes(x=Days)) + ggtitle("b.")+ ggthe_bw+
+FigureS6b<-ggplot(Nino.CCI_data, aes(x=Days)) + ggtitle("b.")+ ggthe_bw+
   theme(legend.box.background = element_rect(),
         legend.position = c(0.25, 0.75),
          panel.grid= element_blank()) +
@@ -1906,7 +1904,7 @@ FigureS5b<-ggplot(Nino.CCI_data, aes(x=Days)) + ggtitle("b.")+ ggthe_bw+
   scale_colour_manual(values = c("magenta","cyan", "black"), name="ENSO")
 #FigureS5b
 
-Sources6<-grid.arrange(FigureS5a,FigureS5b, ncol=2)
+Sources6<-grid.arrange(FigureS6a,FigureS6b, ncol=2)
 
 #ggsave(file="C.Outputs/Figure_S5.svg", plot=Sources6, width=8, height=4.5)
 
@@ -1919,7 +1917,7 @@ Sources6<-grid.arrange(FigureS5a,FigureS5b, ncol=2)
 
 Other way to compare ENSOs is to look at the magnitude and number of the Hot Spots
 
-### Figure S6?
+### Suplemantary Figure S7 - HotSpots
 
 ```{r Supplement3}
 
@@ -1951,34 +1949,47 @@ Other way to compare ENSOs is to look at the magnitude and number of the Hot Spo
 
 ```
 
-**Supplementary Figure S3:** HotSpots (SST - MMM) at Uva Island reef during the two-year period of each El Niño calculated using NOAA OISSTv2 data. Number of HotSpots (n) have been summarized to show how many times they exceeded 2ºC (HotSpots > 2ºC, top values in each panel), were higher than 1ºC but lower or equal to 2ºC (1ºC < HotSpots ≤ 2ºC, middle values), or were lower or equal to 1ºC (0ºC < HotSpots ≤ 1ºC, bottom values). Note that only HotSpots > 1ºC are included in the estimation of DHW. Summation of all HotSpots > 1ºC during each 2 year period were 131.2 during 1982-83, 123.5 during 1997-98, and 108.7 during 2015-16. </br> 
+**Supplementary Figure S7:** HotSpots (SST - MMM) at Uva Island reef during the two-year period of each El Niño calculated using NOAA OISSTv2 data. Number of HotSpots (n) have been summarized to show how many times they exceeded 2ºC (HotSpots > 2ºC, top values in each panel), were higher than 1ºC but lower or equal to 2ºC (1ºC < HotSpots ≤ 2ºC, middle values), or were lower or equal to 1ºC (0ºC < HotSpots ≤ 1ºC, bottom values). Note that only HotSpots > 1ºC are included in the estimation of DHW. Summation of all HotSpots > 1ºC during each 2 year period were 131.2 during 1982-83, 123.5 during 1997-98, and 108.7 during 2015-16. </br> 
 
-##6.2  Number of HS higher than 0, 1, 2, and 3C, area under HS curve
+## 6.2  Number of HS higher than 0, 1, 2, and 3C
 
-```{r HS_numbers}
-  
+Number of HS>1 (used in DHW calculation) 
+
+```{r}
     # Number of HotSpots; HS > 1
         HS_N_1<-as.data.frame(Nino.OI_data %>%
               group_by(Event) %>%
               summarize(N = n(),
                         Cont=sum (HotSpot>=1)))
         HS_N_1
-    
-    # Number of HotSpots; 0<HS<1
+```
+
+Number of 0<HS<1 (not used in DHW calculation) 
+
+```{r}
+# Number of HotSpots; 0<HS<1
         HS_N_0_1<-as.data.frame(Nino.OI_data %>%
               group_by(Event) %>%
               summarize(N = n(),
                         Cont=sum (HotSpot>0 & HotSpot<1)))
         HS_N_0_1
-    
-    # Number of HotSpots; 1<HS<2
+```
+
+Number of 1<HS<2 (used in DHW calculation, lower sterss) 
+
+```{r}
+ # Number of HotSpots; 1<HS<2
         HS_N_1_2<-as.data.frame(Nino.OI_data %>%
               group_by(Event) %>%
               summarize(N = n(),
                         Cont=sum (HotSpot>=1 & HotSpot<2)))
         HS_N_1_2
-    
-    # Number of HotSpots; 2<HS<3
+```
+
+Number of 2<HS<3 (used in DHW calculation, higher sterss) 
+
+```{r}
+# Number of HotSpots; 2<HS<3
         HS_N_2_3<-as.data.frame(Nino.OI_data %>%
               group_by(Event) %>%
               summarize(N = n(),
@@ -1986,27 +1997,37 @@ Other way to compare ENSOs is to look at the magnitude and number of the Hot Spo
         HS_N_2_3
 ```
 
-```{r Area_under_stress}
+## 6.3  Area under HS curve
 
+Area under the HS curve (all HS added)
+
+```{r}
 # Area under of (HS>0)
   HS_Aggregated<-as.data.frame(Nino.OI_data %>%
         group_by(Event) %>%
         summarize(Sum = sum (HotSpot)))
   HS_Aggregated
+```
 
+Area under the HS curve HS>1 added (used in DHW) 
+
+```{r}
 # Area under of (HS>1)
   HS1_Aggregated<-as.data.frame(Nino.OI_data %>%
         group_by(Event) %>%
         summarize(Sum = sum (HotSpot[HotSpot>1])))
   HS1_Aggregated
+```
 
+Area under the HS curve only HS>2 added 
+
+```{r Area_under_stress}
 # Area under (HS>2)
   HS2_Aggregated<-as.data.frame(Nino.OI_data %>%
         group_by(Event) %>%
         summarize(Sum = sum (HotSpot[HotSpot>2])))
   HS2_Aggregated
 ```
-
 
 # 7. Future DHW
 
@@ -2020,7 +2041,7 @@ Uva.Future$Difference<-Uva.Future$Max.DHW-Uva.Future$Max.DHW.MMM.1
 
 ```
 
-### Figure S7?
+### Figure S8: Maximum DHW projected for the period of 2018-2100 at Uva Island reef
 
 ```{r}
 DHW_future<-ggplot(Uva.Future) + 
@@ -2060,3 +2081,5 @@ DHW_future<-ggplot(Uva.Future) +
 DHW_future
 
 ```
+
+**Figure S8:** Maximum DHW projected for the period of 2018-2100 at Uva Island reef using Coupled Model Intercomparison Projects climate models (CMIP6) under the Shared Socioeconomic Pathways (SSP) 8.5 scenario.

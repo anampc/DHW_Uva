@@ -20,7 +20,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -37,8 +37,8 @@
      inkscape:window-height="863"
      id="namedview327"
      showgrid="false"
-     inkscape:zoom="0.65555556"
-     inkscape:cx="45.915254"
+     inkscape:zoom="1.5"
+     inkscape:cx="177.51701"
      inkscape:cy="180"
      inkscape:window-x="76"
      inkscape:window-y="180"
@@ -421,94 +421,6 @@
      id="polyline137" />
   <g
      clip-path="url(#cpMC4wMHw0MzIuMDB8MzYwLjAwfDAuMDA=)"
-     id="g141">
-    <text
-       x="38.24"
-       y="339.70"
-       style="font-size: 8.80px; fill: #4D4D4D; font-family: Arial;"
-       textLength="5.01px"
-       lengthAdjust="spacingAndGlyphs"
-       id="text139">0</text>
-  </g>
-  <g
-     clip-path="url(#cpMC4wMHw0MzIuMDB8MzYwLjAwfDAuMDA=)"
-     id="g145">
-    <text
-       x="83.07"
-       y="339.70"
-       style="font-size: 8.80px; fill: #4D4D4D; font-family: Arial;"
-       textLength="10.01px"
-       lengthAdjust="spacingAndGlyphs"
-       id="text143">90</text>
-  </g>
-  <g
-     clip-path="url(#cpMC4wMHw0MzIuMDB8MzYwLjAwfDAuMDA=)"
-     id="g149">
-    <text
-       x="127.90"
-       y="339.70"
-       style="font-size: 8.80px; fill: #4D4D4D; font-family: Arial;"
-       textLength="15.02px"
-       lengthAdjust="spacingAndGlyphs"
-       id="text147">180</text>
-  </g>
-  <g
-     clip-path="url(#cpMC4wMHw0MzIuMDB8MzYwLjAwfDAuMDA=)"
-     id="g153">
-    <text
-       x="175.24"
-       y="339.70"
-       style="font-size: 8.80px; fill: #4D4D4D; font-family: Arial;"
-       textLength="15.02px"
-       lengthAdjust="spacingAndGlyphs"
-       id="text151">270</text>
-  </g>
-  <g
-     clip-path="url(#cpMC4wMHw0MzIuMDB8MzYwLjAwfDAuMDA=)"
-     id="g157">
-    <text
-       x="222.57"
-       y="339.70"
-       style="font-size: 8.80px; fill: #4D4D4D; font-family: Arial;"
-       textLength="15.02px"
-       lengthAdjust="spacingAndGlyphs"
-       id="text155">360</text>
-  </g>
-  <g
-     clip-path="url(#cpMC4wMHw0MzIuMDB8MzYwLjAwfDAuMDA=)"
-     id="g161">
-    <text
-       x="269.91"
-       y="339.70"
-       style="font-size: 8.80px; fill: #4D4D4D; font-family: Arial;"
-       textLength="15.02px"
-       lengthAdjust="spacingAndGlyphs"
-       id="text159">450</text>
-  </g>
-  <g
-     clip-path="url(#cpMC4wMHw0MzIuMDB8MzYwLjAwfDAuMDA=)"
-     id="g165">
-    <text
-       x="317.24"
-       y="339.70"
-       style="font-size: 8.80px; fill: #4D4D4D; font-family: Arial;"
-       textLength="15.02px"
-       lengthAdjust="spacingAndGlyphs"
-       id="text163">540</text>
-  </g>
-  <g
-     clip-path="url(#cpMC4wMHw0MzIuMDB8MzYwLjAwfDAuMDA=)"
-     id="g169">
-    <text
-       x="364.58"
-       y="339.70"
-       style="font-size: 8.80px; fill: #4D4D4D; font-family: Arial;"
-       textLength="15.02px"
-       lengthAdjust="spacingAndGlyphs"
-       id="text167">630</text>
-  </g>
-  <g
-     clip-path="url(#cpMC4wMHw0MzIuMDB8MzYwLjAwfDAuMDA=)"
      id="g173">
     <text
        x="23.30"
@@ -845,12 +757,13 @@
      id="polyline295" />
   <g
      clip-path="url(#cpMC4wMHw0MzIuMDB8MzYwLjAwfDAuMDA=)"
-     id="g299">
+     id="g299"
+     transform="translate(0,4)">
     <text
        x="182.28"
-       y="352.21"
-       style="font-size: 11.00px; font-family: Arial;"
-       textLength="85.60px"
+       y="352.20999"
+       style="font-size:11px;font-family:Arial"
+       textLength="85.599998"
        lengthAdjust="spacingAndGlyphs"
        id="text297">Month of the year</text>
   </g>
@@ -914,4 +827,196 @@
        lengthAdjust="spacingAndGlyphs"
        id="text321">)</text>
   </g>
+  <text
+     xml:space="preserve"
+     style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:14px;line-height:25px;font-family:Arial;-inkscape-font-specification:Arial;text-align:center;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+     x="41.333332"
+     y="340.41925"
+     id="text977"><tspan
+       sodipodi:role="line"
+       id="tspan975"
+       x="41.333332"
+       y="340.41925"
+       style="font-size:10.66666698px;fill:#1e1e1e;fill-opacity:1">Jan</tspan></text>
+  <text
+     xml:space="preserve"
+     style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:14px;line-height:25px;font-family:Arial;-inkscape-font-specification:Arial;text-align:center;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+     x="88.213936"
+     y="339.42447"
+     id="text977-3"><tspan
+       sodipodi:role="line"
+       id="tspan975-6"
+       x="88.213936"
+       y="339.42447"
+       style="font-size:10.66666698px;fill:#1e1e1e;fill-opacity:1">Apr</tspan></text>
+  <text
+     xml:space="preserve"
+     style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:14px;line-height:25px;font-family:Arial;-inkscape-font-specification:Arial;text-align:center;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+     x="134.81659"
+     y="340.41925"
+     id="text977-7"><tspan
+       sodipodi:role="line"
+       id="tspan975-5"
+       x="134.81659"
+       y="340.41925"
+       style="font-size:10.66666698px;fill:#1e1e1e;fill-opacity:1">Jul</tspan></text>
+  <text
+     xml:space="preserve"
+     style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:14px;line-height:25px;font-family:Arial;-inkscape-font-specification:Arial;text-align:center;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+     x="181.6972"
+     y="340.48697"
+     id="text977-3-3"><tspan
+       sodipodi:role="line"
+       id="tspan975-6-5"
+       x="181.6972"
+       y="340.48697"
+       style="font-size:10.66666698px;fill:#1e1e1e;fill-opacity:1">Oct</tspan></text>
+  <text
+     xml:space="preserve"
+     style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:14px;line-height:25px;font-family:Arial;-inkscape-font-specification:Arial;text-align:center;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+     x="228.0386"
+     y="340.41925"
+     id="text977-6"><tspan
+       sodipodi:role="line"
+       id="tspan975-2"
+       x="228.0386"
+       y="340.41925"
+       style="font-size:10.66666698px;fill:#1e1e1e;fill-opacity:1">Jan</tspan></text>
+  <text
+     xml:space="preserve"
+     style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:14px;line-height:25px;font-family:Arial;-inkscape-font-specification:Arial;text-align:center;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+     x="274.91919"
+     y="339.42447"
+     id="text977-3-9"><tspan
+       sodipodi:role="line"
+       id="tspan975-6-1"
+       x="274.91919"
+       y="339.42447"
+       style="font-size:10.66666698px;fill:#1e1e1e;fill-opacity:1">Apr</tspan></text>
+  <text
+     xml:space="preserve"
+     style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:14px;line-height:25px;font-family:Arial;-inkscape-font-specification:Arial;text-align:center;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+     x="321.52185"
+     y="340.41925"
+     id="text977-7-2"><tspan
+       sodipodi:role="line"
+       id="tspan975-5-7"
+       x="321.52185"
+       y="340.41925"
+       style="font-size:10.66666698px;fill:#1e1e1e;fill-opacity:1">Jul</tspan></text>
+  <text
+     xml:space="preserve"
+     style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:14px;line-height:25px;font-family:Arial;-inkscape-font-specification:Arial;text-align:center;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+     x="368.40247"
+     y="340.48697"
+     id="text977-3-3-0"><tspan
+       sodipodi:role="line"
+       id="tspan975-6-5-9"
+       x="368.40247"
+       y="340.48697"
+       style="font-size:10.66666698px;fill:#1e1e1e;fill-opacity:1">Oct</tspan></text>
+  <text
+     xml:space="preserve"
+     style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:14px;line-height:6.66666651px;font-family:Arial;-inkscape-font-specification:Arial;text-align:center;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+     x="382.88062"
+     y="18.41927"
+     id="text977-36"><tspan
+       sodipodi:role="line"
+       x="382.88062"
+       y="18.41927"
+       style="font-size:8px;line-height:6.66666651px;fill:#1e1e1e;fill-opacity:1"
+       id="tspan1147">n=6</tspan><tspan
+       sodipodi:role="line"
+       x="383.99194"
+       y="26.740463"
+       style="font-size:8px;line-height:6.66666651px;fill:#1e1e1e;fill-opacity:1"
+       id="tspan1153">∑=14.2 </tspan></text>
+  <text
+     xml:space="preserve"
+     style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:14px;line-height:25px;font-family:Arial;-inkscape-font-specification:Arial;text-align:center;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+     x="381.73633"
+     y="70.736984"
+     id="text977-36-6"><tspan
+       sodipodi:role="line"
+       x="381.73633"
+       y="70.736984"
+       style="font-size:8px;line-height:6.66666651px;fill:#1e1e1e;fill-opacity:1"
+       id="tspan1185">n=89∑=131.3</tspan></text>
+  <text
+     xml:space="preserve"
+     style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:14px;line-height:25px;font-family:Arial;-inkscape-font-specification:Arial;text-align:center;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+     x="383.73633"
+     y="102.73698"
+     id="text977-36-61"><tspan
+       sodipodi:role="line"
+       id="tspan975-0-8"
+       x="383.73633"
+       y="102.73698"
+       style="font-size:8px;fill:#1e1e1e;fill-opacity:1">n=300, ∑=280.9</tspan></text>
+  <text
+     xml:space="preserve"
+     style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:14px;line-height:25px;font-family:Arial;-inkscape-font-specification:Arial;text-align:center;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+     x="383.21396"
+     y="144.2448"
+     id="text977-36-7"><tspan
+       sodipodi:role="line"
+       id="tspan975-0-9"
+       x="384.32529"
+       y="144.2448"
+       style="font-size:8px;fill:#1e1e1e;fill-opacity:1">n=4, ∑=8.8 </tspan></text>
+  <text
+     xml:space="preserve"
+     style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:14px;line-height:25px;font-family:Arial;-inkscape-font-specification:Arial;text-align:center;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+     x="382.06967"
+     y="178.5625"
+     id="text977-36-6-2"><tspan
+       sodipodi:role="line"
+       id="tspan975-0-2-0"
+       x="382.06967"
+       y="178.5625"
+       style="font-size:8px;fill:#1e1e1e;fill-opacity:1">n=85, ∑=123.5</tspan></text>
+  <text
+     xml:space="preserve"
+     style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:14px;line-height:25px;font-family:Arial;-inkscape-font-specification:Arial;text-align:center;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+     x="384.06967"
+     y="210.5625"
+     id="text977-36-61-2"><tspan
+       sodipodi:role="line"
+       id="tspan975-0-8-3"
+       x="384.06967"
+       y="210.5625"
+       style="font-size:8px;fill:#1e1e1e;fill-opacity:1">n=253, ∑=234.9</tspan></text>
+  <text
+     xml:space="preserve"
+     style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:14px;line-height:25px;font-family:Arial;-inkscape-font-specification:Arial;text-align:center;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+     x="381.21396"
+     y="254.2448"
+     id="text977-36-75"><tspan
+       sodipodi:role="line"
+       id="tspan975-0-92"
+       x="381.21396"
+       y="254.2448"
+       style="font-size:8px;fill:#1e1e1e;fill-opacity:1">n=0, ∑=0</tspan></text>
+  <text
+     xml:space="preserve"
+     style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:14px;line-height:25px;font-family:Arial;-inkscape-font-specification:Arial;text-align:center;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+     x="380.06967"
+     y="288.5625"
+     id="text977-36-6-28"><tspan
+       sodipodi:role="line"
+       id="tspan975-0-2-9"
+       x="381.181"
+       y="288.5625"
+       style="font-size:8px;fill:#1e1e1e;fill-opacity:1">n=89, ∑=108.7 </tspan></text>
+  <text
+     xml:space="preserve"
+     style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:14px;line-height:25px;font-family:Arial;-inkscape-font-specification:Arial;text-align:center;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+     x="382.06967"
+     y="320.5625"
+     id="text977-36-61-7"><tspan
+       sodipodi:role="line"
+       id="tspan975-0-8-36"
+       x="382.06967"
+       y="320.5625"
+       style="font-size:8px;fill:#1e1e1e;fill-opacity:1">n=357, ∑=273.6</tspan></text>
 </svg>
