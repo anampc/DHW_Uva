@@ -135,7 +135,6 @@ Calculate the mean SST per month-year, the monthly mean and then obtain the maxi
 
 ```
 
-
 ## 2.2 CRW MMM
 
 Import the MMM from CRW 5km suit products
@@ -172,7 +171,6 @@ Import the MMM from CRW 5km suit products
 ## 2.3 In Situ MMM
 
 This code uses in situ available data collected by Tyler Smith et al and calculates an approximated In Situ climatology (~1997-2018, with gaps). The time frame used in this climatology differs from the CWR and OI climatologies. We decided to use all the data available since data were scarcer. 
-
 
 ```{r InSitu_MMM}
 # Extract months and years from date
