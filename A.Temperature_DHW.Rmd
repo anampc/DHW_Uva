@@ -2032,7 +2032,7 @@ Area under the HS curve only HS>2 added
 ```{r}
 
 #OI_SST (provided by Ruben van Hooidonk)
-    Uva.Future<-read.csv("B.Temperature_data/Uva_DHW_SSP5-8.5_MMM+1.csv",header = T)
+    Uva.Future<-read.csv("B.Temperature_data/Uva_DHW_SSP5-8.5_All.csv",header = T)
 head(Uva.Future)
 
 Uva.Future$Difference<-Uva.Future$Max.DHW-Uva.Future$Max.DHW.MMM.1
@@ -2045,19 +2045,21 @@ Uva.Future$Difference<-Uva.Future$Max.DHW-Uva.Future$Max.DHW.MMM.1
 DHW_future<-ggplot(Uva.Future) + 
       geom_line(aes(x=Year, y=Max.DHW.MMM.1), 
                 linetype=1, size=0.3, alpha=1, color="red")+
+      geom_line(aes(x=Year, y=Max.DHW.MMM.2.5), 
+                linetype=1, size=0.3, alpha=1, color="blue")+
   theme_bw()+
   theme(legend.box.background = element_rect(),
         legend.position = "top",
         panel.grid= element_blank(), 
         axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1)) +
-  geom_hline(yintercept=10.00, linetype="dashed", 
-             color="black", size=0.5)+
-  geom_hline(yintercept=20.00, linetype="dashed",
-             color="black", size=1)+
-  geom_hline(yintercept=30.00, linetype="dashed",
-             color="black", size=1.5)+
-  geom_hline(yintercept=40.00, linetype="dashed",
-             color="black", size=2)+
+  # geom_hline(yintercept=10.00, linetype="dashed", 
+  #            color="black", size=0.5)+
+  # geom_hline(yintercept=20.00, linetype="dashed",
+  #            color="black", size=1)+
+  # geom_hline(yintercept=30.00, linetype="dashed",
+  #            color="black", size=1.5)+
+  # geom_hline(yintercept=40.00, linetype="dashed",
+  #            color="black", size=2)+
   
   scale_x_continuous(limits = c(2018, 2100),
                      name=(""),
@@ -2068,15 +2070,17 @@ DHW_future<-ggplot(Uva.Future) +
                        "Expected annual maximum DHW"~(
                          degree*C ~"-weeks")~"under SSP-8.5")), 
                      expand = c(0.01, 0.01),
-                     breaks = seq(0,40, by=4))+
- annotate("text", x = c(2083, 2030, 2030, 2030),
-                  y = c(11, 21, 31, 41), 
-          label = c("Max DHW recorded (1998)",
-                    "2x max DHW recorded",
-                    "3x max DHW recorded", 
-                    "4x max DHW recorded"))
+                     breaks = seq(0,40, by=4))#+
+ # annotate("text", x = c(2083, 2030, 2030, 2030),
+ #                  y = c(11, 21, 31, 41), 
+ #          label = c("Max DHW recorded (1998)",
+ #                    "2x max DHW recorded",
+ #                    "3x max DHW recorded", 
+ #                    "4x max DHW recorded"))
   
 DHW_future
+
+#ggsave(file="C.Outputs/Figure_SSP.svg", plot=DHW_future, width=5.5, height=5.0)
 
 ```
 
