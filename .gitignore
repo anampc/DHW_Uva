@@ -30,9 +30,6 @@ README.html
 **/B.Temperature_data/*/*
 .Rproj.user
 
-# .svg and .eps figures
-/C.Outputs/*.svg
+# .eps figures
 /C.Outputs/*.eps
-
-C.Outputs/*.svg
 C.Outputs/*.eps
