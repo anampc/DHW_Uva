@@ -4,7 +4,7 @@
 
 ### Description:
 
-This repository obtains and analyzes SST data for Uva Island reef to compare the intensity of heat stress during the past three major ENSOs.
+This repository obtains and analyzes SST data for Uva Island reef to compare the intensity of heat stress during the past three major ENSOs for the paper "Increased dominance of heat-tolerant symbionts creates resilient coral reefs in near-term ocean warming" doi: 10.1073/pnas.220238812
 
 </br>
 
